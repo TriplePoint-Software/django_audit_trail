@@ -4,8 +4,6 @@
 import re
 import subprocess
 
-__author__ = 'syabro'
-
 
 def get_last_version_from_tags():
     versions = subprocess.check_output(["git", "tag"])

@@ -8,7 +8,6 @@ setup(
     packages=['audit_trail', 'audit_trail.migrations', 'audit_trail.south_migrations'],
     url='https://github.com/AssuraGroup/audit_trail',
     license='',
-    author='syabro',
     author_email='',
     description='',
     install_requires=["django == 1.7.2"],
