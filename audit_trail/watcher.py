@@ -1,16 +1,16 @@
-import json
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import signals
 from .models import AuditTrail
-from .utils import get_request
 
 
 class AuditTrailWatcher(object):
     tracked_models = set()
     tracked_fields = None
+    excluded_fields = None
+    model_class = None
 
     def __init__(self, fields=None, **kwargs):
         self.tracked_fields = fields
+        self.excluded_fields = ['id'] + kwargs.get('excluded_fields', [])
 
         self.track_creation = kwargs.get('track_creation', True)
         self.track_update = kwargs.get('track_update', True)
@@ -20,10 +20,9 @@ class AuditTrailWatcher(object):
         if cls in self.__class__.tracked_models:
             return
 
-        self.__class__.tracked_models.add(cls)
+        self.model_class = cls
 
-        # if self.fields is None:
-        #     self.fields = [field.name for field in cls._meta.fields]
+        self.__class__.tracked_models.add(cls)
 
         signals.class_prepared.connect(self.finalize, sender=cls)
 
@@ -42,47 +41,64 @@ class AuditTrailWatcher(object):
         """ Returns stringified values for tracked fields. """
         data = {}
         for field in instance._meta.fields:
-
             # Skip untracked fields
-            if self.tracked_fields is not None and field.name not in self.tracked_fields:
+            not_tracked_field = (self.tracked_fields is not None and field.name not in self.tracked_fields)
+            if not_tracked_field or field.name in self.excluded_fields:
                 continue
-
-            data[field.name] = unicode(field.value_from_object(instance))
+            data[field.name] = field.value_from_object(instance)
         return data
 
-    def get_changes(self, instance):
+    def get_changes(self, old_values, new_values):
         """ Returns list of changed fields."""
         diff = []
-        original_data = instance._original_values
-        for key, value in self.serialize_object(instance).iteritems():
-            if original_data[key] != value:
-                diff.append((key, original_data[key], value))
+        old_values = old_values or {}
+        new_values = new_values or {}
+
+        tracked_fields = self.tracked_fields or [field.name for field in self.model_class._meta.fields]
+
+        for field in tracked_fields:
+            old_value = old_values.get(field, '')
+            new_value = new_values.get(field, '')
+
+            if old_value is None:
+                old_value = ''
+
+            if new_value is None:
+                new_value = ''
+            if old_value != new_value:
+                diff.append({
+                    'field': field,
+                    'old_value': old_value,
+                    'new_value': new_value
+                })
         return diff
 
     def on_post_init(self, instance, sender, **kwargs):
         """ Stores original field values. """
         instance._original_values = self.serialize_object(instance)
 
-    def on_post_save_update(self, instance, sender, created, **kwargs):
-        """ Checks for difference and saves, if it's present. """
-        if created:
-            return
-        changes = self.get_changes(instance)
-        if changes:
-            audit_trail = AuditTrail.objects.generate_trail_for_instance_updated(instance)
-            audit_trail.changes = changes
-            audit_trail.save()
-
     def on_post_save_create(self, instance, sender, created, **kwargs):
         """ Saves object's data. """
         if not created:
             return
         audit_trail = AuditTrail.objects.generate_trail_for_instance_created(instance)
-        audit_trail.changes = self.serialize_object(instance)
+        audit_trail.changes = self.get_changes({}, self.serialize_object(instance))
         audit_trail.save()
+        instance._original_values = self.serialize_object(instance)
+
+    def on_post_save_update(self, instance, sender, created, **kwargs):
+        """ Checks for difference and saves, if it's present. """
+        if created:
+            return
+        changes = self.get_changes(instance._original_values, self.serialize_object(instance))
+        if changes:
+            audit_trail = AuditTrail.objects.generate_trail_for_instance_updated(instance)
+            audit_trail.changes = changes
+            audit_trail.save()
+        instance._original_values = self.serialize_object(instance)
 
     def on_post_delete(self, instance, sender, **kwargs):
         """ Saves deleted data. """
         audit_trail = AuditTrail.objects.generate_trail_for_instance_deleted(instance)
-        audit_trail.changes = [(key, value, value) for key, value in self.serialize_object(instance).iteritems()]
+        audit_trail.changes = self.get_changes(self.serialize_object(instance), {})
         audit_trail.save()

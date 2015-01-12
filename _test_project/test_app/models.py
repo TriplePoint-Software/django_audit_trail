@@ -11,5 +11,6 @@ class TestModelTrackOneField(models.Model):
 
 class TestModelTrackAllFields(models.Model):
     char = models.CharField(max_length=255, null=True)
+    char2 = models.CharField(max_length=255, null=True)
 
     audit = AuditTrailWatcher()
