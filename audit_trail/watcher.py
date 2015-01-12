@@ -8,19 +8,6 @@ __author__ = 'syabro'
 
 
 class AuditTrailWatcher(object):
-    """ A class which adds trailing changes in models.
-
-    Usage:
-
-    class MyModel(models.Model):
-        field1, field2, field3 = models.IntegerField(), models.IntegerField(), models.IntegerField()
-        field4, field5         = models.TextField(), models.TextField()
-        audit = audit_trail(field2, field5)  # only field2 and field5 are tracked
-        OR
-        audit = audit_trail('field2', 'field5') # specify field names in string
-        OR
-        audit = audit_trail(field2, field5, track_creation=False, track_deletion=False) # tracks only update
-    """
     tracked_models = set()
     fields = None
 
