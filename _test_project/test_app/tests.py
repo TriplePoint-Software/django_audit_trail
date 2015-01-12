@@ -15,8 +15,6 @@ class TestSimple(TestCase):
             'new_value': 'a'
         }])
 
-        self.assertEqual('a','b')
-
     def test_create_audit_trail_on_deletion(self):
         model = TestModelTrackAllFields.objects.create(char='a')
         self.assertEqual(AuditTrail.objects.all().count(), 1)
