@@ -1,5 +1,6 @@
-import collections
-import sys, itertools
+import sys
+import itertools
+
 
 def get_request(exact_keys=None):
     """ Walks through frames and search for 'request' object.

@@ -8,8 +8,9 @@ Replace this with more appropriate tests for your application.
 from django.test import TestCase
 from django.db import models
 
-from audit_trail.models import audit_trail, AuditTrail
+from audit_trail.models import audit_trail
 from mock import Mock
+from audit_trail.trail import AuditTrailWatcher
 
 
 class TestModel(models.Model):
@@ -24,7 +25,7 @@ class AuditTrailTest(TestCase):
     def test_creation_with_audit(self):
         m = TestModel()
         m.save = Mock()
-        AuditTrail.save = Mock()
+        AuditTrailWatcher.save = Mock()
         self.assertEqual(1 + 1, 2)
 
     def test_double_save_audit(self):

@@ -1,7 +1,15 @@
 from django.db import models
+from audit_trail import AuditTrailWatcher
 
 
-class TestModel(models.Model):
+class TestModelTrackOneField(models.Model):
     char = models.CharField(max_length=255, null=True)
     text = models.TextField(null=True)
-    datetime = models.DateTimeField(null=True)
+
+    audit = AuditTrailWatcher(fields=['char'])
+
+
+class TestModelTrackAllFields(models.Model):
+    char = models.CharField(max_length=255, null=True)
+
+    audit = AuditTrailWatcher()

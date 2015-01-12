@@ -11,12 +11,21 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='TestModel',
+            name='TestModelTrackAllFields',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('char', models.CharField(max_length=255)),
-                ('text', models.TextField()),
-                ('datetime', models.DateTimeField()),
+                ('char', models.CharField(max_length=255, null=True)),
+            ],
+            options={
+            },
+            bases=(models.Model,),
+        ),
+        migrations.CreateModel(
+            name='TestModelTrackOneField',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('char', models.CharField(max_length=255, null=True)),
+                ('text', models.TextField(null=True)),
             ],
             options={
             },

@@ -2,7 +2,6 @@ from setuptools import setup
 
 __version__ = "0.0.01"
 
-DJANGO_REQUIREMENT = "Django >= 1.7.2"
 setup(
     name='audit_trail',
     version=__version__,
@@ -12,8 +11,8 @@ setup(
     author='syabro',
     author_email='',
     description='',
-    install_requires=[DJANGO_REQUIREMENT],
-    tests_require=[DJANGO_REQUIREMENT],
+    install_requires=["django == 1.7.2"],
+    tests_require=["django == 1.7.2"],
     test_suite='runtests.runtests'
 
 )
