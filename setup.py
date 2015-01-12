@@ -10,8 +10,8 @@ setup(
     license='',
     author_email='',
     description='',
-    install_requires=["django == 1.7.2"],
-    tests_require=["django == 1.7.2"],
+    install_requires=["django == 1.7.2", "django-jsonfield==0.9.13"],
+    tests_require=["django == 1.7.2", "django-jsonfield==0.9.13"],
     test_suite='runtests.runtests'
 
 )
