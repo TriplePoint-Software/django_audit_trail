@@ -22,8 +22,8 @@ def generate_version():
         exit()
 
     last_version = get_last_version_from_tags()
-    with open('setup.py', 'r') as file:
-        setup_py = file.read()
+    with open('setup.py', 'r') as setup_py_file:
+        setup_py = setup_py_file.read()
 
     new_version = last_version[:]
     new_version[2] += 1
@@ -42,5 +42,5 @@ def generate_version():
     print
     print 'Version %s created. Push it to origin with "git push --tags"' % new_version
 
-if __name__=='__main__':
+if __name__ == '__main__':
     generate_version()
