@@ -1,3 +1,5 @@
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.db.models import DateField
 from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -5,7 +7,6 @@ from django.db import models
 
 from jsonfield import JSONField
 
-from .formatter import AuditTrailFormatter
 from utils import get_request
 
 
@@ -52,6 +53,7 @@ class AuditTrail(models.Model):
     """ Table to store all changes of subscribed models. """
     content_type = models.ForeignKey(ContentType, blank=True, null=True)
     object_id = models.TextField(blank=True, null=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     user = models.ForeignKey(User, blank=True, null=True)
     user_ip = models.IPAddressField(null=True)
@@ -59,7 +61,6 @@ class AuditTrail(models.Model):
     object_repr = models.CharField(max_length=200)
     action = models.PositiveSmallIntegerField(choices=ACTION_CHOICES)
     action_time = models.DateTimeField(auto_now=True)
-    # keeps serialized values for previous values
     changes = JSONField()
 
     objects = AuditTrailManager()
@@ -67,8 +68,35 @@ class AuditTrail(models.Model):
     class Meta:
         ordering = ('-id',)
 
-    def get_formatted_changes(self, formatter=AuditTrailFormatter):
-        return formatter.format(self.action_flag, self.changes)
-
     def __repr__(self):
         return smart_unicode(self.action_time)
+
+    @property
+    def is_created(self):
+        return self.action == self.ACTIONS.CREATED
+
+    @property
+    def is_updated(self):
+        return self.action == self.ACTIONS.UPDATED
+
+    @property
+    def is_deleted(self):
+        return self.action == self.ACTIONS.DELETED
+
+    def get_changes(self):
+        model_class = self.content_type.model_class()
+        audit_watcher = model_class.audit
+        changes = [change.copy() for change in self.changes]
+        if audit_watcher.field_labels is not None:
+            for change in changes:
+                change['field_label'] = audit_watcher.field_labels.get(change['field'], '')
+
+        if audit_watcher.order:
+            def sort_key(change):
+                try:
+                    return audit_watcher.order.index(change['field'])
+                except ValueError:
+                    return '%d%s' % (len(audit_watcher.order), change['field'])
+            changes = sorted(changes, key=sort_key)
+
+        return changes

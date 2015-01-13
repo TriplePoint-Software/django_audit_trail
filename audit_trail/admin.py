@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.template.loader import render_to_string
 
 from .models import AuditTrail
 from .watcher import AuditTrailWatcher
@@ -22,10 +23,36 @@ class ContentTypeFilter(SimpleListFilter):
             return queryset.filter(content_type_id=self.value())
         else:
             return queryset
-       
+
+
+def action(audit_trail):
+    color = ''
+
+    if audit_trail.is_deleted:
+        color = '#FF7575'
+
+    if audit_trail.is_created:
+        color = '#27DE55'
+
+    if audit_trail.is_updated:
+        color = '#FFFF84'
+
+    return u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">%s</div>' % (
+        color, audit_trail.get_action_display()
+    )
+
+action.allow_tags = True
+
+
+def render_changes(audit_trail):
+    changes = audit_trail.get_changes()
+    return render_to_string('audit_trail/changes.html', {'audit_trail': audit_trail, 'changes': changes})
+
+render_changes.allow_tags = True
+
 
 class AuditTrailAdmin(admin.ModelAdmin):
-    list_display = ('action_time', 'user', 'user_ip', 'content_type', 'object_repr', 'format_json_values')
+    list_display = ('action_time', action, 'user', 'user_ip', 'content_type', 'object_repr', render_changes)
     list_filter = (ContentTypeFilter, 'action')
     actions = None
 
@@ -43,7 +70,7 @@ class AuditTrailAdmin(admin.ModelAdmin):
         return False
 
     def format_json_values(self, obj):
-        return obj.get_formatted_values()
+        return obj.get_formatted_changes()
 
     format_json_values.short_description = 'Changes'
     format_json_values.allow_tags = True

@@ -1,0 +1,20 @@
+<tr>
+    <td>
+        {% if change.field_label %}
+            {{ change.field_label }}
+        {% else %}
+            {{ change.field }}
+        {% endif %}
+    </td>
+    {% if audit_trail.is_updated or audit_trail.is_deleted %}
+        <td>
+            {{ change.old_value }}
+        </td>
+    {% endif %}
+    {% if audit_trail.is_updated %}
+        <td style="width: 30px">→</td>
+    {% endif %}
+    {% if audit_trail.is_updated or audit_trail.created %}
+        <td>{{ change.new_value }}</td>
+    {% endif %}
+</tr>

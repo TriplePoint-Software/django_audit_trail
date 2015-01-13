@@ -7,9 +7,14 @@ class AuditTrailWatcher(object):
     tracked_fields = None
     excluded_fields = None
     model_class = None
+    field_names = None
+    order = None
 
-    def __init__(self, fields=None, **kwargs):
+    def __init__(self, fields=None, field_labels=None, order=None, **kwargs):
         self.tracked_fields = fields
+        self.field_labels = field_labels
+        self.order = order
+
         self.excluded_fields = ['id'] + kwargs.get('excluded_fields', [])
 
         self.track_creation = kwargs.get('track_creation', True)
@@ -25,6 +30,7 @@ class AuditTrailWatcher(object):
         self.__class__.tracked_models.add(cls)
 
         signals.class_prepared.connect(self.finalize, sender=cls)
+        setattr(cls, name, self)
 
     def finalize(self, sender, **kwargs):
         if self.track_creation:
