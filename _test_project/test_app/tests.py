@@ -1,8 +1,7 @@
-import datetime
 from django.test import TestCase
 from audit_trail.models import AuditTrail
 from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, TestModelWithFieldsOrder, \
-    TestModelWithDateField
+    Post, Comment, User
 
 
 class TestSimple(TestCase):
@@ -114,3 +113,40 @@ class TestSimple(TestCase):
         trail = AuditTrail.objects.all()[0]
         self.assertEqual(trail.get_changes()[0]['field'], 'char2')
         self.assertEqual(trail.get_changes()[1]['field'], 'char')
+
+    def test_related_tracking_init_watcher_for_subclass(self):
+        #  We only initialized audit on Post but Comment.should be created automatically
+        self.assertIsNotNone(getattr(Comment, 'audit', None))
+
+    def test_related_tracking(self):
+        author = User.objects.create()
+        post = Post.objects.create(author=author)
+        self.assertEqual(AuditTrail.objects.all().count(), 1)
+
+        comment = Comment.objects.create()
+        self.assertEqual(AuditTrail.objects.all().count(), 1)
+
+        comment = Comment.objects.create(post=post)
+        self.assertEqual(AuditTrail.objects.all().count(), 3)
+
+        post_trail = AuditTrail.objects.all()[0]
+        comment_trail = AuditTrail.objects.all()[1]
+        self.assertEqual(post_trail.action, AuditTrail.ACTIONS.RELATED_CHANGED)
+        self.assertEqual(post_trail.related_trail, comment_trail)
+
+    def test_fk_tracking(self):
+        author = User.objects.create()
+        self.assertEqual(AuditTrail.objects.all().count(), 0)
+        post = Post.objects.create(author=author)
+        self.assertEqual(AuditTrail.objects.all().count(), 1)
+        author.name = 'new name'
+        author.save()
+        self.assertEqual(AuditTrail.objects.all().count(), 3)
+
+        post_trail = AuditTrail.objects.all()[0]
+        user_trail = AuditTrail.objects.all()[1]
+        self.assertEqual(post_trail.action, AuditTrail.ACTIONS.RELATED_CHANGED)
+        self.assertEqual(post_trail.related_trail, user_trail)
+
+        author.delete()
+        self.assertEqual(AuditTrail.objects.all().count(), 5)

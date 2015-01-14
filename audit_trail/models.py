@@ -1,5 +1,4 @@
 from django.contrib.contenttypes.fields import GenericForeignKey
-from django.db.models import DateField
 from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
@@ -36,6 +35,9 @@ class AuditTrailManager(models.Manager):
     def generate_trail_for_instance_deleted(self, instance):
         return self.generate_for_instance(instance, AuditTrail.ACTIONS.DELETED)
 
+    def generate_trail_for_related_change(self, instance):
+        return self.generate_for_instance(instance, AuditTrail.ACTIONS.RELATED_CHANGED)
+
 
 class AuditTrail(models.Model):
 
@@ -43,11 +45,13 @@ class AuditTrail(models.Model):
         CREATED = 1
         UPDATED = 2
         DELETED = 3
+        RELATED_CHANGED = 4
 
     ACTION_CHOICES = (
         (ACTIONS.CREATED, 'Created'),
         (ACTIONS.UPDATED, 'Updated'),
-        (ACTIONS.DELETED, 'Deleted')
+        (ACTIONS.DELETED, 'Deleted'),
+        (ACTIONS.RELATED_CHANGED, 'Related changed')
     )
 
     """ Table to store all changes of subscribed models. """
@@ -62,6 +66,8 @@ class AuditTrail(models.Model):
     action = models.PositiveSmallIntegerField(choices=ACTION_CHOICES)
     action_time = models.DateTimeField(auto_now=True)
     changes = JSONField()
+
+    related_trail = models.ForeignKey(to='self', null=True)
 
     objects = AuditTrailManager()
 
@@ -93,9 +99,9 @@ class AuditTrail(models.Model):
 
         if audit_watcher.order:
             def sort_key(change):
-                try:
+                try:  # Trying to order by `order`
                     return audit_watcher.order.index(change['field'])
-                except ValueError:
+                except ValueError:  # if field isn't in order put it after ordered fields and order by name
                     return '%d%s' % (len(audit_watcher.order), change['field'])
             changes = sorted(changes, key=sort_key)
 

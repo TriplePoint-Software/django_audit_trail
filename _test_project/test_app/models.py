@@ -32,7 +32,19 @@ class TestModelWithFieldsOrder(models.Model):
     audit = AuditTrailWatcher(order=['char2', 'char'])
 
 
-class TestModelWithDateField(models.Model):
-    date = models.DateField(null=True)
+# Test related tracking
+class User(models.Model):
+    name = models.CharField(blank=True, max_length=255)
 
-    audit = AuditTrailWatcher()
+
+class Post(models.Model):
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    audit = AuditTrailWatcher(track_related=['comment_set', 'author'])
+
+
+class Comment(models.Model):
+    post = models.ForeignKey(Post, null=True)
+    text = models.CharField(blank=True, max_length=255)
+
+
+
