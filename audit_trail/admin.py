@@ -28,18 +28,21 @@ class ContentTypeFilter(SimpleListFilter):
 def action(audit_trail):
     color = ''
 
-    if audit_trail.is_deleted:
-        color = '#FF7575'
+    colors = {
+        AuditTrail.ACTIONS.DELETED: '#FF7575',
+        AuditTrail.ACTIONS.CREATED: '#27DE55',
+        AuditTrail.ACTIONS.UPDATED: '#FFFF84',
+    }
 
-    if audit_trail.is_created:
-        color = '#27DE55'
+    if audit_trail.action in [AuditTrail.ACTIONS.CREATED, AuditTrail.ACTIONS.UPDATED, AuditTrail.ACTIONS.DELETED]:
+        return u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">%s</div>' % (
+            colors[audit_trail.action], audit_trail.get_action_display()
+        )
+    if audit_trail.is_related_changed:
+        return u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">Related %s</div>' % (
+            colors[audit_trail.related_trail.action], audit_trail.related_trail.get_action_display().lower()
+        )
 
-    if audit_trail.is_updated:
-        color = '#FFFF84'
-
-    return u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">%s</div>' % (
-        color, audit_trail.get_action_display()
-    )
 
 action.allow_tags = True
 
@@ -52,8 +55,9 @@ render_changes.allow_tags = True
 
 
 class AuditTrailAdmin(admin.ModelAdmin):
-    list_display = ('action_time', action, 'user', 'user_ip', 'content_type', 'object_repr', render_changes)
-    list_filter = (ContentTypeFilter, 'action')
+    list_display = ('id', 'action_time', action, 'user', 'user_ip', 'content_type', 'object_repr', render_changes)
+    list_filter = (ContentTypeFilter, 'action',)
+    search_fields = ('object_id', )
     actions = None
 
     def __init__(self, *args, **kwargs):

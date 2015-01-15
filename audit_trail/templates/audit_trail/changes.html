@@ -1,23 +1,28 @@
+{% load admin_urls %}
 <style>
     .audit_trail_changes, .audit_trail_changes tr, .audit_trail_changes td {
         border: 0 !important;
     }
 </style>
-
-<table class="audit_trail_changes" style="border: 0">
-    {% for change in changes|slice:":6" %}
-        {% include "audit_trail/change_row.html" %}
-    {% endfor %}
-    {% if changes|length > 6 %}
-        <tr class="show_more_link_container">
-            <td colspan="3">
-                <a href="#" onclick="django.jQuery(this).parents('.audit_trail_changes').find('.more_changes').show(); django.jQuery(this).parents('.show_more_link_container').hide();">Show more</a>
-            </td>
-        </tr>
-        <tbody class="more_changes" style="display: none">
-            {% for change in changes|slice:"6:" %}
-                {% include "audit_trail/change_row.html" %}
-            {% endfor %}
-        </tbody>
-    {% endif %}
-</table>
+{% if audit_trail.is_related_changed %}
+    <b>"{{ audit_trail.related_trail.object_repr }}"</b>
+    <a href="{% url 'admin:audit_trail_audittrail_changelist' %}?id={{ audit_trail.related_trail.id }}">was {{ audit_trail.related_trail.get_action_display|lower }}</a>
+{% else %}
+    <table class="audit_trail_changes" style="border: 0">
+        {% for change in changes|slice:":6" %}
+            {% include "audit_trail/change_row.html" %}
+        {% endfor %}
+        {% if changes|length > 6 %}
+            <tr class="show_more_link_container">
+                <td colspan="3">
+                    <a href="#" onclick="django.jQuery(this).parents('.audit_trail_changes').find('.more_changes').show(); django.jQuery(this).parents('.show_more_link_container').hide();">Show more</a>
+                </td>
+            </tr>
+            <tbody class="more_changes" style="display: none">
+                {% for change in changes|slice:"6:" %}
+                    {% include "audit_trail/change_row.html" %}
+                {% endfor %}
+            </tbody>
+        {% endif %}
+    </table>
+{% endif %}

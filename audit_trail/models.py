@@ -89,6 +89,10 @@ class AuditTrail(models.Model):
     def is_deleted(self):
         return self.action == self.ACTIONS.DELETED
 
+    @property
+    def is_related_changed(self):
+        return self.action == self.ACTIONS.RELATED_CHANGED
+
     def get_changes(self):
         model_class = self.content_type.model_class()
         audit_watcher = model_class.audit
