@@ -9,7 +9,13 @@ Model history tracking
         field1, field2, field3 = models.IntegerField(), models.IntegerField(), models.IntegerField()
         field4, field5         = models.TextField(), models.TextField()
         
-        audit = AuditTrailWatcher(fields=['field1', 'field2'], track_creation=True, track_update=True, track_deletion=True)
+        audit = AuditTrailWatcher(
+            fields=['field1', 'field2'],
+            track_creation=True,
+            track_update=True,
+            track_deletion=True,
+            track_related=['somemodel_set', 'somefk']
+        )
 ```
 
 ## Options
@@ -17,4 +23,5 @@ Model history tracking
 **fields** — list of fields to track. If is not provided — track all fields.  
 **track_creation** — track model creation, default True  
 **track_update** — track model update, default True  
-**track_deletion** — track model deletion, default True  
+**track_deletion** — track model deletion, default True 
+**track_related** - track related objects changes
