@@ -1,7 +1,7 @@
 from django.test import TestCase
 from audit_trail.models import AuditTrail
 from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, TestModelWithFieldsOrder, \
-    Post, Comment, User, AA, AB, BB
+    Post, Comment, User, AA, AB, BB, ShortcutTestModel
 
 
 class TestSimple(TestCase):
@@ -156,3 +156,14 @@ class TestSimple(TestCase):
         self.assertEqual(BB.audit.track_related, ['ab_set'])
         self.assertEqual(AB.audit.track_only_with_related, False)
         self.assertEqual(sorted(AB.audit.notify_related), ['aa', 'bb'])
+
+    def test_shortcut(self):
+        model = ShortcutTestModel.objects.create(name='a')
+        self.assertEqual(AuditTrail.objects.all().count(), 1)
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
+        self.assertEqual(trail.get_changes(), [{
+            'field': 'name',
+            'old_value': '',
+            'new_value': 'a'
+        }])

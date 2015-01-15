@@ -1,5 +1,5 @@
 from django.db import models
-from audit_trail import AuditTrailWatcher
+from audit_trail import AuditTrailWatcher, audit_trail_watch
 
 
 class TestModelTrackOneField(models.Model):
@@ -60,3 +60,10 @@ class AB(models.Model):
     aa = models.ForeignKey(AA)
     bb = models.ForeignKey(BB)
     audit = AuditTrailWatcher()
+
+
+# Test shortcut
+class ShortcutTestModel(models.Model):
+    name = models.CharField(blank=True, max_length=255)
+
+audit_trail_watch(ShortcutTestModel)
