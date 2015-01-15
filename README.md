@@ -23,5 +23,5 @@ Model history tracking
 **fields** — list of fields to track. If is not provided — track all fields.  
 **track_creation** — track model creation, default True  
 **track_update** — track model update, default True  
-**track_deletion** — track model deletion, default True 
+**track_deletion** — track model deletion, default True  
 **track_related** - track related objects changes
