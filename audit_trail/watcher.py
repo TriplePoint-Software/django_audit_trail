@@ -150,16 +150,20 @@ class AuditTrailWatcher(object):
             return
 
         changes = self.get_changes(instance._original_values, self.serialize_object(instance))
-        if changes:
-            audit_trail = AuditTrail.objects.generate_trail_for_instance_updated(instance)
-            audit_trail.changes = changes
-            audit_trail.save()
+        if not changes:
+            return
+
+        audit_trail = AuditTrail.objects.generate_trail_for_instance_updated(instance)
+        audit_trail.changes = changes
+        audit_trail.save()
         instance._original_values = self.serialize_object(instance)
 
         self.create_related_audit_trail(audit_trail)
 
     def on_pre_delete(self, instance, sender, **kwargs):
         """ Check if there related query_set that track current objects saves ids. """
+        if not self.notify_related:
+            return
         instance._audit_ids_to_notify_related_deletion = {}
         for field_name in self.notify_related:
             parent_object = getattr(instance, field_name, None)
