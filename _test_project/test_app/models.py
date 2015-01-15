@@ -47,4 +47,16 @@ class Comment(models.Model):
     text = models.CharField(blank=True, max_length=255)
 
 
+# Test related tracking with audit instance existing in related object
+class AA(models.Model):
+    audit = AuditTrailWatcher(track_related=['ab_set'])
 
+
+class BB(models.Model):
+    audit = AuditTrailWatcher(track_related=['ab_set'])
+
+
+class AB(models.Model):
+    aa = models.ForeignKey(AA)
+    bb = models.ForeignKey(BB)
+    audit = AuditTrailWatcher()

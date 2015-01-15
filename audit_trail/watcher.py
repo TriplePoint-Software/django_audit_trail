@@ -49,8 +49,6 @@ class AuditTrailWatcher(object):
         setattr(cls, 'audit', self)
 
     def init_signals(self):
-        # signals.class_prepared.connect(self.finalize, sender=self.model_class)
-
         signals.post_save.connect(self.on_post_save_create, sender=self.model_class, weak=False)
         signals.post_init.connect(self.on_post_init, sender=self.model_class, weak=False)
         signals.post_save.connect(self.on_post_save_update, sender=self.model_class, weak=False)
@@ -65,11 +63,11 @@ class AuditTrailWatcher(object):
 
         for attr_name in self.track_related:
             attribute = getattr(self.model_class, attr_name)
-            if hasattr(attribute, 'related'):  # related object set
+            if hasattr(attribute, 'related'):  # related object is queryset
                 related = attribute.related
                 related_model = related.model
                 related_field_name = related.field.name
-            else:
+            else:  # related object is FK
                 related_model = attribute.field.related_field.model
                 related_field_name = attribute.field.related_query_name()
 
@@ -79,10 +77,12 @@ class AuditTrailWatcher(object):
                 if not hasattr(related_model, related_field_name):
                     related_field_name = related_field_name + '_set'
 
-            if getattr(related_model, 'audit', None) is None:
-                related_watcher = AuditTrailWatcher(notify_related=[related_field_name], track_only_with_related=True)
+            if not hasattr(related_model, 'audit'):
+                related_watcher = AuditTrailWatcher(track_only_with_related=True)
                 related_watcher.contribute_to_class(related_model)
                 related_watcher.init_signals()
+            related_model.audit.notify_related = related_model.audit.notify_related or []
+            related_model.audit.notify_related += [related_field_name]
 
     def serialize_object(self, instance):
         """ Returns stringified values for tracked fields. """

@@ -1,7 +1,7 @@
 from django.test import TestCase
 from audit_trail.models import AuditTrail
 from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, TestModelWithFieldsOrder, \
-    Post, Comment, User
+    Post, Comment, User, AA, AB, BB
 
 
 class TestSimple(TestCase):
@@ -150,3 +150,9 @@ class TestSimple(TestCase):
 
         author.delete()
         self.assertEqual(AuditTrail.objects.all().count(), 5)
+
+    def test_related_tracking_ordering(self):
+        self.assertEqual(AA.audit.track_related, ['ab_set'])
+        self.assertEqual(BB.audit.track_related, ['ab_set'])
+        self.assertEqual(AB.audit.track_only_with_related, False)
+        self.assertEqual(sorted(AB.audit.notify_related), ['aa', 'bb'])
