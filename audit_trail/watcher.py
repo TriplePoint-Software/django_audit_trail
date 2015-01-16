@@ -42,11 +42,12 @@ class AuditTrailWatcher(object):
 
     def contribute_to_class(self, cls, name=None):
         if cls in self.__class__.tracked_models:
-            return
+            return False
 
         self.model_class = cls
         self.__class__.tracked_models.add(cls)
         setattr(cls, 'audit', self)
+        return True
 
     def init_signals(self):
         signals.post_save.connect(self.on_post_save_create, sender=self.model_class, weak=False)
@@ -76,11 +77,11 @@ class AuditTrailWatcher(object):
                 # F.e. instead of 'post_set' it'll return 'post' so we have to handle it manually
                 if not hasattr(related_model, related_field_name):
                     related_field_name = related_field_name + '_set'
-
             if not hasattr(related_model, 'audit'):
                 related_watcher = AuditTrailWatcher(track_only_with_related=True)
                 related_watcher.contribute_to_class(related_model)
                 related_watcher.init_signals()
+
             related_model.audit.notify_related = related_model.audit.notify_related or []
             related_model.audit.notify_related += [related_field_name]
 
@@ -102,7 +103,6 @@ class AuditTrailWatcher(object):
         diff = []
         old_values = old_values or {}
         new_values = new_values or {}
-
         fields = self.fields or [field.name for field in self.model_class._meta.fields]
 
         for field in fields:

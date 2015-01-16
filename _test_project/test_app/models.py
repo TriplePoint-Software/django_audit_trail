@@ -67,3 +67,21 @@ class ShortcutTestModel(models.Model):
     name = models.CharField(blank=True, max_length=255)
 
 audit_trail_watch(ShortcutTestModel)
+
+
+# Test shortcut related model duplicate
+# audit_trail_watch(Post1) shouldn't override track_related
+# audit_trail_watch(Comment1) should set track_only_with_related to True
+class Post1(models.Model):
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    audit = AuditTrailWatcher(track_related=['comment1_set'])
+
+
+class Comment1(models.Model):
+    post = models.ForeignKey(Post1, null=True)
+    text = models.CharField(blank=True, max_length=255)
+    audit = AuditTrailWatcher(fields=['text'])
+
+
+audit_trail_watch(Post1)
+audit_trail_watch(Comment1)

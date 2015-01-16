@@ -1,7 +1,7 @@
 from django.test import TestCase
 from audit_trail.models import AuditTrail
 from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, TestModelWithFieldsOrder, \
-    Post, Comment, User, AA, AB, BB, ShortcutTestModel
+    Post, Comment, User, AA, AB, BB, ShortcutTestModel, Post1, Comment1
 
 
 class TestSimple(TestCase):
@@ -167,3 +167,8 @@ class TestSimple(TestCase):
             'old_value': '',
             'new_value': 'a'
         }])
+
+    def test_shortcut_override_class_attribute(self):
+        self.assertEqual(Post1.audit.track_related, ['comment1_set'])
+        self.assertEqual(Comment1.audit.track_only_with_related, False)
+        self.assertEqual(Comment1.audit.fields, ['text'])
