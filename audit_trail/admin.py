@@ -55,7 +55,7 @@ render_changes.allow_tags = True
 
 
 class AuditTrailAdmin(admin.ModelAdmin):
-    list_display = ('id', 'action_time', action, 'user', 'user_ip', 'content_type', 'object_repr', render_changes)
+    list_display = ('id', 'action_time', 'content_type', action, 'user', 'user_ip',  'object_repr', render_changes)
     list_filter = (ContentTypeFilter, 'action',)
     search_fields = ('object_id', )
     actions = None

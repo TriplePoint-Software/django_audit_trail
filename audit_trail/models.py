@@ -1,15 +1,67 @@
+from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
+from django.core.serializers.json import DjangoJSONEncoder
 from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.module_loading import import_string
 
 from jsonfield import JSONField
 
 from utils import get_request
 
 
+encoder_class = DjangoJSONEncoder
+if hasattr(settings, 'JSONFIELD_ENCODER'):
+    encoder_class = import_string(getattr(settings, 'JSONFIELD_ENCODER'))
+
+dump_kwargs = {
+    'cls': encoder_class,
+    'separators': (',', ':')
+}
+
+
+class AuditTrailQuerySet(models.QuerySet):
+    def get_changes(self):
+        changes = []
+        changes_dict = {}
+        if not self.exists():
+            return changes
+
+        model_class = self[0].content_type.model_class()
+
+        for trail in self.order_by('id'):
+            if not isinstance(trail.content_object, model_class):
+                raise ValueError(
+                    'AuditTrailQuerySet.get_changes couldn\'t get changes for different models: %s and %s' % (
+                        model_class.__name__, trail.content_object.__class__.__name__
+                    ))
+            for field_change in trail.get_changes():
+                field = field_change['field']
+                if not field in changes_dict:
+                    changes_dict[field] = field_change
+                    continue
+                changes_dict[field]['new_value'] = field_change['new_value']
+        changes = changes_dict.values()
+
+        audit_watcher = model_class.audit
+        if audit_watcher.order:
+            def sort_key(change):
+                try:  # Trying to order by `order`
+                    return audit_watcher.order.index(change['field'])
+                except ValueError:  # if field isn't in order put it after ordered fields and order by name
+                    return '%d%s' % (len(audit_watcher.order), change['field'])
+
+            changes = sorted(changes, key=sort_key)
+
+        return changes
+
+
 class AuditTrailManager(models.Manager):
+    def get_queryset(self):
+        return AuditTrailQuerySet(self.model, using=self._db)
+
     def generate_for_instance(self, instance, action):
         audit_trail = self.model(
             content_type=ContentType.objects.get_for_model(instance),
@@ -40,7 +92,6 @@ class AuditTrailManager(models.Manager):
 
 
 class AuditTrail(models.Model):
-
     class ACTIONS:
         CREATED = 1
         UPDATED = 2
@@ -65,7 +116,7 @@ class AuditTrail(models.Model):
     object_repr = models.CharField(max_length=200)
     action = models.PositiveSmallIntegerField(choices=ACTION_CHOICES)
     action_time = models.DateTimeField(auto_now=True)
-    changes = JSONField()
+    changes = JSONField(dump_kwargs=dump_kwargs)
 
     related_trail = models.ForeignKey(to='self', null=True)
 
@@ -107,6 +158,7 @@ class AuditTrail(models.Model):
                     return audit_watcher.order.index(change['field'])
                 except ValueError:  # if field isn't in order put it after ordered fields and order by name
                     return '%d%s' % (len(audit_watcher.order), change['field'])
+
             changes = sorted(changes, key=sort_key)
 
         return changes

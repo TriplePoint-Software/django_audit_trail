@@ -1,4 +1,5 @@
 from django.test import TestCase
+import audit_trail
 from audit_trail.models import AuditTrail
 from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, TestModelWithFieldsOrder, \
     Post, Comment, User, AA, AB, BB, ShortcutTestModel, Post1, Comment1
@@ -172,3 +173,59 @@ class TestSimple(TestCase):
         self.assertEqual(Post1.audit.track_related, ['comment1_set'])
         self.assertEqual(Comment1.audit.track_only_with_related, False)
         self.assertEqual(Comment1.audit.fields, ['text'])
+
+    def test_queryset_changes(self):
+        model = TestModelWithFieldsOrder.objects.create(char='a')
+        self.assertEqual(AuditTrail.objects.all().count(), 1)
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
+        self.assertEqual(trail.get_changes(), [{
+            'field': 'char',
+            'old_value': '',
+            'new_value': 'a'
+        }])
+
+        model.char2 = 'b'
+        model.save()
+        self.assertEqual(AuditTrail.objects.all().count(), 2)
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
+        self.assertEqual(trail.get_changes(), [{
+            'field': 'char2',
+            'old_value': '',
+            'new_value': 'b'
+        }])
+
+        trails = audit_trail.get_for_object(model)
+        self.assertEqual(trails.get_changes(), [{
+            'field': 'char2',
+            'old_value': '',
+            'new_value': 'b'
+        }, {
+            'field': 'char',
+            'old_value': '',
+            'new_value': 'a'
+        }])
+
+        model.char = 'AAA'
+        model.save()
+
+        self.assertEqual(AuditTrail.objects.all().count(), 3)
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
+        self.assertEqual(trail.get_changes(), [{
+            'field': 'char',
+            'old_value': 'a',
+            'new_value': 'AAA'
+        }])
+
+        trails = audit_trail.get_for_object(model)
+        self.assertEqual(trails.get_changes(), [{
+            'field': 'char2',
+            'old_value': '',
+            'new_value': 'b'
+        }, {
+            'field': 'char',
+            'old_value': '',
+            'new_value': 'AAA'
+        }])

@@ -5,8 +5,12 @@
     }
 </style>
 {% if audit_trail.is_related_changed %}
-    <b>"{{ audit_trail.related_trail.object_repr }}"</b>
-    <a href="{% url 'admin:audit_trail_audittrail_changelist' %}?id={{ audit_trail.related_trail.id }}">was {{ audit_trail.related_trail.get_action_display|lower }}</a>
+    <b>{{ audit_trail.related_trail.content_type|capfirst }}</b>
+    "{{ audit_trail.related_trail.object_repr }}"
+    was {{ audit_trail.related_trail.get_action_display|lower }}
+    {% with audit_trail=audit_trail.related_trail changes=audit_trail.related_trail.get_changes %}
+        {% include "audit_trail/changes.html" %}
+    {% endwith %}
 {% else %}
     <table class="audit_trail_changes" style="border: 0">
         {% for change in changes|slice:":6" %}
