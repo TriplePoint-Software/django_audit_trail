@@ -6,7 +6,7 @@ setup(
     name='audit_trail',
     version=__version__,
     packages=['audit_trail', 'audit_trail.migrations', 'audit_trail.south_migrations'],
-    url='https://github.com/AssuraGroup/audit_trail',
+    url='https://github.com/TriplePoint-Software/audit_trail',
     license='',
     author_email='',
     description='',
