@@ -125,6 +125,10 @@ class AuditTrailWatcher(object):
 
     def on_post_save_create(self, instance, sender, created, **kwargs):
         """ Saves object's data. """
+
+        if getattr(settings, 'DISABLE_AUDIT_LOG', False):
+            return
+
         if not created:
             return
 
@@ -140,6 +144,9 @@ class AuditTrailWatcher(object):
 
     def on_post_save_update(self, instance, sender, created, **kwargs):
         """ Checks for difference and saves, if it's present. """
+        if getattr(settings, 'DISABLE_AUDIT_LOG', False):
+            return
+
         if created:
             return
 
@@ -159,6 +166,9 @@ class AuditTrailWatcher(object):
 
     def on_pre_delete(self, instance, sender, **kwargs):
         """ Check if there related query_set that track current objects saves ids. """
+        if getattr(settings, 'DISABLE_AUDIT_LOG', False):
+            return
+
         if not self.notify_related:
             return
         instance._audit_ids_to_notify_related_deletion = {}
@@ -172,6 +182,9 @@ class AuditTrailWatcher(object):
 
     def on_post_delete(self, instance, sender, **kwargs):
         """ Saves deleted object data. """
+        if getattr(settings, 'DISABLE_AUDIT_LOG', False):
+            return
+
         if self.track_only_with_related and not self.is_parent_object_exists(instance):
             return
 
