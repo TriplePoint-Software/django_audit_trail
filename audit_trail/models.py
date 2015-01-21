@@ -24,10 +24,9 @@ dump_kwargs = {
 
 class AuditTrailQuerySet(models.QuerySet):
     def get_changes(self):
-        changes = []
         changes_dict = {}
         if not self.exists():
-            return changes
+            return {}
 
         model_class = self[0].content_type.model_class()
 
@@ -37,25 +36,14 @@ class AuditTrailQuerySet(models.QuerySet):
                     'AuditTrailQuerySet.get_changes couldn\'t get changes for different models: %s and %s' % (
                         model_class.__name__, trail.content_object.__class__.__name__
                     ))
-            for field_change in trail.get_changes():
-                field = field_change['field']
+            for field, field_change in trail.get_changes().items():
                 if not field in changes_dict:
                     changes_dict[field] = field_change
                     continue
                 changes_dict[field]['new_value'] = field_change['new_value']
-        changes = changes_dict.values()
+                changes_dict[field]['field_label'] = field_change.get('field_label', '')
 
-        audit_watcher = model_class.audit
-        if audit_watcher.order:
-            def sort_key(change):
-                try:  # Trying to order by `order`
-                    return audit_watcher.order.index(change['field'])
-                except ValueError:  # if field isn't in order put it after ordered fields and order by name
-                    return '%d%s' % (len(audit_watcher.order), change['field'])
-
-            changes = sorted(changes, key=sort_key)
-
-        return changes
+        return changes_dict
 
 
 class AuditTrailManager(models.Manager):
@@ -145,20 +133,10 @@ class AuditTrail(models.Model):
         return self.action == self.ACTIONS.RELATED_CHANGED
 
     def get_changes(self):
+        changes = self.changes.copy()
         model_class = self.content_type.model_class()
         audit_watcher = model_class.audit
-        changes = [change.copy() for change in self.changes]
-        if audit_watcher.field_labels is not None:
-            for change in changes:
-                change['field_label'] = audit_watcher.field_labels.get(change['field'], '')
-
-        if audit_watcher.order:
-            def sort_key(change):
-                try:  # Trying to order by `order`
-                    return audit_watcher.order.index(change['field'])
-                except ValueError:  # if field isn't in order put it after ordered fields and order by name
-                    return '%d%s' % (len(audit_watcher.order), change['field'])
-
-            changes = sorted(changes, key=sort_key)
-
+        labels = audit_watcher.field_labels or {}
+        for field_name, change in changes.items():
+            change['field_label'] = labels.get(field_name, field_name)
         return changes

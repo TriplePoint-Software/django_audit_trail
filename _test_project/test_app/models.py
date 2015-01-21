@@ -24,14 +24,6 @@ class TestModelWithFieldLabels(models.Model):
     audit = AuditTrailWatcher(field_labels=FIELD_LABELS)
 
 
-class TestModelWithFieldsOrder(models.Model):
-    a = models.IntegerField(null=True)
-    char = models.CharField(max_length=255, null=True)
-    char2 = models.CharField(max_length=255, null=True)
-
-    audit = AuditTrailWatcher(order=['char2', 'char'])
-
-
 # Test related tracking
 class User(models.Model):
     name = models.CharField(blank=True, max_length=255)
