@@ -1,6 +1,6 @@
 from setuptools import setup
 
-__version__ = "0.0.15"
+__version__ = "0.0.16"
 
 setup(
     name='audit_trail',
