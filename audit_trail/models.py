@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.serializers.json import DjangoJSONEncoder
@@ -36,14 +37,49 @@ class AuditTrailQuerySet(models.QuerySet):
                     'AuditTrailQuerySet.get_changes couldn\'t get changes for different models: %s and %s' % (
                         model_class.__name__, trail.content_object.__class__.__name__
                     ))
-            for field, field_change in trail.get_changes().items():
-                if not field in changes_dict:
-                    changes_dict[field] = field_change
-                    continue
-                changes_dict[field]['new_value'] = field_change['new_value']
-                changes_dict[field]['field_label'] = field_change.get('field_label', '')
+
+            if trail.is_related_changed:
+                continue
+
+            self._apply_field_changes(changes_dict, trail)
 
         return changes_dict
+
+    def get_related_changes(self):
+        related_changes_dict = OrderedDict()
+        changes = self.filter(action=AuditTrail.ACTIONS.RELATED_CHANGED).order_by('id')
+        for change in changes:
+            related_trail = change.related_trail
+            key = '%s.%s-%d' % (
+                related_trail.content_type.app_label,
+                related_trail.content_type.name,
+                int(related_trail.object_id)
+            )
+
+            related_object_changes = related_changes_dict.get(key, None)
+
+            if related_object_changes is None:
+                related_object_changes = {
+                    'action': related_trail.get_action_display(),
+                    'representation': related_trail.object_repr,
+                    'changes': {}
+                }
+                related_changes_dict[key] = related_object_changes
+
+            if related_trail.is_deleted and related_object_changes['action'] == 'Created':
+                del related_changes_dict[key]
+
+            self._apply_field_changes(related_object_changes['changes'], related_trail)
+        return related_changes_dict.values()
+
+    def _apply_field_changes(self, changes_dict, trail):
+        for field, field_change in trail.get_changes().items():
+            if not field in changes_dict:
+                changes_dict[field] = field_change
+                continue
+            changes_dict[field]['new_value'] = field_change['new_value']
+            changes_dict[field]['field_label'] = field_change.get('field_label', '')
+
 
 
 class AuditTrailManager(models.Manager):
@@ -113,8 +149,8 @@ class AuditTrail(models.Model):
     class Meta:
         ordering = ('-id',)
 
-    def __repr__(self):
-        return smart_unicode(self.action_time)
+    def __unicode__(self):
+        return u'%s was %s at %s' % (self.object_repr, self.get_action_display().lower(), self.action_time.isoformat())
 
     @property
     def is_created(self):

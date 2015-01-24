@@ -1,3 +1,4 @@
+import datetime
 from django.test import TestCase
 import audit_trail
 from audit_trail.models import AuditTrail
@@ -250,4 +251,62 @@ class TestSimple(TestCase):
                 'new_value': 'AAA',
                 'field_label': 'char'
             }
+        })
+
+    def test_queryset_get_related_changes(self):
+        """
+        1. Create post
+        2. Create comment 1
+        3. Create comment 2
+
+        --- Testing changes
+        4. Delete comment 1
+        5. Change comment 3
+        6. Create comment 3
+        """
+        author = User.objects.create()
+        post = Post.objects.create(author=author)
+        comment1 = Comment.objects.create(post=post, text='comment 1 text')
+        comment2 = Comment.objects.create(post=post, text='comment 2 text')
+
+        time_from = datetime.datetime.now()
+
+        comment1.delete()
+        comment2.text = 'comment 2 text change'
+        comment2.save()
+        comment3 = Comment.objects.create(post=post, text='comment 3 text')
+
+        # Do not display created and deleted object during period
+        comment4 = Comment.objects.create(post=post, text='comment 3 text')
+        comment4.delete()
+
+        trails = audit_trail.get_for_object(post).filter(action_time__gt=time_from).order_by()
+        related_objects_changes = trails.get_related_changes()
+        self.assertEqual(len(related_objects_changes), 3)
+
+        comment1_changes = related_objects_changes[0]
+        self.assertEqual(comment1_changes['representation'], 'Comment 1')
+        self.assertEqual(comment1_changes['action'], 'Deleted')
+        self.assertEqual(comment1_changes['changes']['text'], {
+            'field_label': u'text',
+            'new_value': u'',
+            'old_value': u'comment 1 text'
+        })
+
+        comment2_changes = related_objects_changes[1]
+        self.assertEqual(comment2_changes['representation'], 'Comment 2')
+        self.assertEqual(comment2_changes['action'], 'Updated')
+        self.assertEqual(comment2_changes['changes']['text'], {
+            'field_label': u'text',
+            'new_value': u'comment 2 text change',
+            'old_value': u'comment 2 text'
+        })
+
+        comment3_changes = related_objects_changes[2]
+        self.assertEqual(comment3_changes['representation'], 'Comment 3')
+        self.assertEqual(comment3_changes['action'], 'Created')
+        self.assertEqual(comment3_changes['changes']['text'], {
+            'field_label': u'text',
+            'new_value': u'comment 3 text',
+            'old_value': u''
         })

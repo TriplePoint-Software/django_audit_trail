@@ -37,6 +37,12 @@ class Post(models.Model):
 class Comment(models.Model):
     post = models.ForeignKey(Post, null=True)
     text = models.CharField(blank=True, max_length=255)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    audit = AuditTrailWatcher(fields=['text'])
+
+    def __unicode__(self):
+        return 'Comment %d' % self.id
 
 
 # Test related tracking with audit instance existing in related object
