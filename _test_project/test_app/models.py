@@ -39,7 +39,7 @@ class Comment(models.Model):
     text = models.CharField(blank=True, max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    audit = AuditTrailWatcher(fields=['text'])
+    audit = AuditTrailWatcher(fields=['text'], track_only_with_related=True)
 
     def __unicode__(self):
         return 'Comment %d' % self.id
