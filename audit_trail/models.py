@@ -62,7 +62,8 @@ class AuditTrailQuerySet(models.QuerySet):
                 related_object_changes = {
                     'action': related_trail.get_action_display(),
                     'representation': related_trail.object_repr,
-                    'changes': {}
+                    'changes': {},
+                    'model': '%s.%s' % (related_trail.content_type.app_label, related_trail.content_type.name)
                 }
                 related_changes_dict[key] = related_object_changes
 

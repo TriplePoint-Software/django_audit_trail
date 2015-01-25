@@ -287,26 +287,30 @@ class TestAuditTrail(TestCase):
         comment1_changes = related_objects_changes[0]
         self.assertEqual(comment1_changes['representation'], 'Comment 1')
         self.assertEqual(comment1_changes['action'], 'Deleted')
+        self.assertEqual(comment1_changes['model'], 'test_app.comment')
         self.assertEqual(comment1_changes['changes']['text'], {
             'field_label': u'text',
             'new_value': u'',
-            'old_value': u'comment 1 text'
+            'old_value': u'comment 1 text',
+
         })
 
         comment2_changes = related_objects_changes[1]
         self.assertEqual(comment2_changes['representation'], 'Comment 2')
         self.assertEqual(comment2_changes['action'], 'Updated')
+        self.assertEqual(comment1_changes['model'], 'test_app.comment')
         self.assertEqual(comment2_changes['changes']['text'], {
             'field_label': u'text',
             'new_value': u'comment 2 text change',
-            'old_value': u'comment 2 text'
+            'old_value': u'comment 2 text',
         })
 
         comment3_changes = related_objects_changes[2]
         self.assertEqual(comment3_changes['representation'], 'Comment 3')
         self.assertEqual(comment3_changes['action'], 'Created')
+        self.assertEqual(comment1_changes['model'], 'test_app.comment')
         self.assertEqual(comment3_changes['changes']['text'], {
             'field_label': u'text',
             'new_value': u'comment 3 text',
-            'old_value': u''
+            'old_value': u'',
         })
