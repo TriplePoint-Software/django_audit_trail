@@ -17,11 +17,11 @@ class TestModelTrackAllFields(models.Model):
 
 
 class TestModelWithFieldLabels(models.Model):
-    char = models.CharField(max_length=255, null=True)
-    char2 = models.CharField(max_length=255, null=True)
+    char = models.CharField(verbose_name='Char 1', max_length=255, null=True)
+    char2 = models.CharField(verbose_name='Char 2', max_length=255, null=True)
+    char_3 = models.CharField(max_length=255, null=True)
 
-    FIELD_LABELS = {'char': 'Char Label', 'char2': 'Char Label 2'}
-    audit = AuditTrailWatcher(field_labels=FIELD_LABELS)
+    audit = AuditTrailWatcher()
 
 
 # Test related tracking

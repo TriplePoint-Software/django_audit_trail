@@ -74,13 +74,11 @@ class AuditTrailQuerySet(models.QuerySet):
         return related_changes_dict.values()
 
     def _apply_field_changes(self, changes_dict, trail):
-        for field, field_change in trail.get_changes().items():
-            if not field in changes_dict:
-                changes_dict[field] = field_change
+        for field_name, field_change in trail.get_changes().items():
+            if not field_name in changes_dict:
+                changes_dict[field_name] = field_change
                 continue
-            changes_dict[field]['new_value'] = field_change['new_value']
-            changes_dict[field]['field_label'] = field_change.get('field_label', '')
-
+            changes_dict[field_name]['new_value'] = field_change['new_value']
 
 
 class AuditTrailManager(models.Manager):
@@ -172,8 +170,6 @@ class AuditTrail(models.Model):
     def get_changes(self):
         changes = self.changes.copy()
         model_class = self.content_type.model_class()
-        audit_watcher = model_class.audit
-        labels = audit_watcher.field_labels or {}
         for field_name, change in changes.items():
-            change['field_label'] = labels.get(field_name, field_name)
+            change['field_label'] = model_class._meta.get_field(field_name).verbose_name.capitalize()
         return changes

@@ -17,12 +17,11 @@ class AuditTrailWatcher(object):
 
     tracked_models = set()
 
-    def __init__(self, fields=None, track_related=None, field_labels=None, notify_related=None,
+    def __init__(self, fields=None, track_related=None, notify_related=None,
                  track_only_with_related=False, excluded_fields=None):
         """
         :param fields: list fields that should be tracked. If None — all fields will be tracked.
         :param track_related: list of tracked relations. F.e. ['comment_set']
-        :param field_labels: dict of field labels that should be used on changes list generation
         :param notify_related: list of fields to be notified as parent. Internal use only
         :param track_only_with_related: boolean state should be AuditTrail object created or not if there is no parent
                object. F.e. if we track Post's comment_set and we don't need to track comments separately.
@@ -33,7 +32,6 @@ class AuditTrailWatcher(object):
         self.notify_related = notify_related
         self.track_related = track_related
         self.track_only_with_related = track_only_with_related
-        self.field_labels = field_labels
         self.excluded_fields = ['id']
         if excluded_fields:
             self.excluded_fields += self.excluded_fields

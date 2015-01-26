@@ -16,7 +16,7 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': '',
                 'new_value': 'a',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -32,7 +32,7 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': 'a',
                 'new_value': '',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -53,7 +53,7 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': 'a',
                 'new_value': 'b',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -70,7 +70,7 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': 'a',
                 'new_value': 'b',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -84,7 +84,7 @@ class TestAuditTrail(TestCase):
             'char2': {
                 'old_value': 'x',
                 'new_value': 'y',
-                'field_label': 'char2'
+                'field_label': 'Char2'
             }
         })
 
@@ -94,7 +94,7 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': 'a',
                 'new_value': 'b',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -108,21 +108,22 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': 'b',
                 'new_value': 'c',
-                'field_label': 'char'
+                'field_label': 'Char'
             },
             'char2': {
                 'old_value': 'y',
                 'new_value': 'z',
-                'field_label': 'char2'
+                'field_label': 'Char2'
             }
         })
 
     def test_field_labels(self):
-        TestModelWithFieldLabels.objects.create(char='a', char2='x')
-
+        TestModelWithFieldLabels.objects.create(char='a', char2='x', char_3='1')
         trail = AuditTrail.objects.all()[0]
-        self.assertEqual(trail.get_changes()['char']['field_label'], TestModelWithFieldLabels.FIELD_LABELS['char'])
-        self.assertEqual(trail.get_changes()['char2']['field_label'], TestModelWithFieldLabels.FIELD_LABELS['char2'])
+        
+        self.assertEqual(trail.get_changes()['char']['field_label'], 'Char 1')
+        self.assertEqual(trail.get_changes()['char2']['field_label'], 'Char 2')
+        self.assertEqual(trail.get_changes()['char_3']['field_label'], 'Char 3')
 
     def test_related_tracking_init_watcher_for_subclass(self):
         # We only initialized audit on Post but Comment.should be created automatically
@@ -176,7 +177,7 @@ class TestAuditTrail(TestCase):
             'name': {
                 'old_value': '',
                 'new_value': 'a',
-                'field_label': 'name'
+                'field_label': 'Name'
             }
         })
 
@@ -194,7 +195,7 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': '',
                 'new_value': 'a',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -207,7 +208,7 @@ class TestAuditTrail(TestCase):
             'char2': {
                 'old_value': '',
                 'new_value': 'b',
-                'field_label': 'char2'
+                'field_label': 'Char2'
             }
         })
 
@@ -216,12 +217,12 @@ class TestAuditTrail(TestCase):
             'char2': {
                 'old_value': '',
                 'new_value': 'b',
-                'field_label': 'char2'
+                'field_label': 'Char2'
             },
             'char': {
                 'old_value': '',
                 'new_value': 'a',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -235,7 +236,7 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': 'a',
                 'new_value': 'AAA',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -244,12 +245,12 @@ class TestAuditTrail(TestCase):
             'char2': {
                 'old_value': '',
                 'new_value': 'b',
-                'field_label': 'char2'
+                'field_label': 'Char2'
             },
             'char': {
                 'old_value': '',
                 'new_value': 'AAA',
-                'field_label': 'char'
+                'field_label': 'Char'
             }
         })
 
@@ -289,7 +290,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(comment1_changes['action'], 'Deleted')
         self.assertEqual(comment1_changes['model'], 'test_app.comment')
         self.assertEqual(comment1_changes['changes']['text'], {
-            'field_label': u'text',
+            'field_label': u'Text',
             'new_value': u'',
             'old_value': u'comment 1 text',
 
@@ -300,7 +301,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(comment2_changes['action'], 'Updated')
         self.assertEqual(comment1_changes['model'], 'test_app.comment')
         self.assertEqual(comment2_changes['changes']['text'], {
-            'field_label': u'text',
+            'field_label': u'Text',
             'new_value': u'comment 2 text change',
             'old_value': u'comment 2 text',
         })
@@ -310,7 +311,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(comment3_changes['action'], 'Created')
         self.assertEqual(comment1_changes['model'], 'test_app.comment')
         self.assertEqual(comment3_changes['changes']['text'], {
-            'field_label': u'text',
+            'field_label': u'Text',
             'new_value': u'comment 3 text',
             'old_value': u'',
         })
