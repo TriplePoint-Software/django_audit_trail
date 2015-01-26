@@ -13,7 +13,7 @@
     {% endwith %}
 {% else %}
     <table class="audit_trail_changes" style="border: 0">
-        {% for change in changes|slice:":6" %}
+        {% for field_label, change in changes.items|slice:":6" %}
             {% include "audit_trail/change_row.html" %}
         {% endfor %}
         {% if changes|length > 6 %}
@@ -23,7 +23,7 @@
                 </td>
             </tr>
             <tbody class="more_changes" style="display: none">
-                {% for change in changes|slice:"6:" %}
+                {% for field_label, change in changes.items|slice:"6:" %}
                     {% include "audit_trail/change_row.html" %}
                 {% endfor %}
             </tbody>
