@@ -168,6 +168,9 @@ class AuditTrail(models.Model):
         return self.action == self.ACTIONS.RELATED_CHANGED
 
     def get_changes(self):
+        if not isinstance(self.changes, dict):
+            return self.changes
+
         changes = self.changes.copy()
         model_class = self.content_type.model_class()
         for field_name, change in changes.items():
