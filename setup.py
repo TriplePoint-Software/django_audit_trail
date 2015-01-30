@@ -6,7 +6,7 @@ setup(
     name='django_audit_trail',
     version=__version__,
     packages=['audit_trail', 'audit_trail.migrations', 'audit_trail.south_migrations'],
-    url='https://github.com/TriplePoint-Software/audit_trail',
+    url='https://github.com/TriplePoint-Software/django_audit_trail',
     license='Apache License, Version 2.0',
     author_email='',
     description='App for tracking django model changes',
