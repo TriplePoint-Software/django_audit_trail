@@ -139,6 +139,8 @@ class AuditTrail(models.Model):
     object_repr = models.CharField(max_length=200)
     action = models.PositiveSmallIntegerField(choices=ACTION_CHOICES)
     action_time = models.DateTimeField(auto_now=True)
+
+    # pylint: disable-msg=E1123
     changes = JSONField(dump_kwargs=dump_kwargs)
 
     related_trail = models.ForeignKey(to='self', null=True)
