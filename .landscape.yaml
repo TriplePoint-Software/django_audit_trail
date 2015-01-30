@@ -2,6 +2,8 @@ doc-warnings: yes
 test-warnings: no
 strictness: high
 max-line-length: 120
+ignore-paths:
+    - _test_project
 uses:
     - django
 autodetect: yes

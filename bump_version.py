@@ -8,7 +8,7 @@ import subprocess
 def get_last_version_from_tags():
     versions = subprocess.check_output(["git", "tag"])
     versions = versions.split('\n')
-    version_regex = re.compile('(\d+)\.(\d+)\.(\d+)')
+    version_regex = re.compile(r'(\d+)\.(\d+)\.(\d+)')
     versions = [map(int, v.split('.')) for v in versions if version_regex.match(v)]
     versions.sort(reverse=True)
     return versions[0]
@@ -31,8 +31,8 @@ def generate_version():
     print 'upgrading from %s to %s' % (last_version, new_version)
 
     version_line_re = re.compile(r'''(__version__ =)(\s*['"]\d+\.\d+\.\d+["'])''', flags=re.M)
-    with open('setup.py', 'w') as f:
-        f.write(version_line_re.sub('\\1 "%s"' % new_version, setup_py))
+    with open('setup.py', 'w') as setup_file:
+        setup_file.write(version_line_re.sub('\\1 "%s"' % new_version, setup_py))
 
     subprocess.check_output(["git", 'commit', '-m', '"version %s"' % new_version, '-a'])
     subprocess.check_output(["git", 'tag', '%s' % new_version])
