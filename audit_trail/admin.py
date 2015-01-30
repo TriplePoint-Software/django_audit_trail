@@ -1,3 +1,4 @@
+# pylint: disable-msg=E1002,E1101
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
@@ -26,8 +27,6 @@ class ContentTypeFilter(SimpleListFilter):
 
 
 def action(audit_trail):
-    color = ''
-
     colors = {
         AuditTrail.ACTIONS.DELETED: '#FF7575',
         AuditTrail.ACTIONS.CREATED: '#27DE55',
@@ -55,7 +54,7 @@ render_changes.allow_tags = True
 
 
 class AuditTrailAdmin(admin.ModelAdmin):
-    list_display = ('id', 'action_time', 'content_type', action, 'user', 'user_ip',  'object_repr', render_changes)
+    list_display = ('id', 'action_time', 'content_type', action, 'user', 'user_ip', 'object_repr', render_changes)
     list_filter = (ContentTypeFilter, 'action',)
     search_fields = ('object_id', )
     actions = None

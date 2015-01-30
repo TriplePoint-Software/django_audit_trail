@@ -2,7 +2,6 @@ from collections import OrderedDict
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.serializers.json import DjangoJSONEncoder
-from django.utils.encoding import smart_unicode
 from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
@@ -115,7 +114,7 @@ class AuditTrailManager(models.Manager):
 
 
 class AuditTrail(models.Model):
-    class ACTIONS:
+    class ACTIONS(object):
         CREATED = 1
         UPDATED = 2
         DELETED = 3
