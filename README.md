@@ -27,3 +27,5 @@ Model history tracking
 **track_update** — track model update, default True  
 **track_deletion** — track model deletion, default True  
 **track_related** - track related objects changes
+
+![](https://landscape.io/github/TriplePoint-Software/audit_trail/master/landscape.svg)
