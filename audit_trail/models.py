@@ -1,3 +1,4 @@
+# pylint: disable-msg=E1101,W0403,C0111,R0201
 from collections import OrderedDict
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -12,12 +13,12 @@ from jsonfield import JSONField
 from utils import get_request
 
 
-encoder_class = DjangoJSONEncoder
+ENCODER_CLASS = DjangoJSONEncoder
 if hasattr(settings, 'JSONFIELD_ENCODER'):
-    encoder_class = import_string(getattr(settings, 'JSONFIELD_ENCODER'))
+    ENCODER_CLASS = import_string(getattr(settings, 'JSONFIELD_ENCODER'))
 
 dump_kwargs = {
-    'cls': encoder_class,
+    'cls': ENCODER_CLASS,
     'separators': (',', ':')
 }
 
