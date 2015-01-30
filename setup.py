@@ -3,7 +3,7 @@ from setuptools import setup
 __version__ = "0.0.22"
 
 setup(
-    name='audit_trail',
+    name='django_audit_trail',
     version=__version__,
     packages=['audit_trail', 'audit_trail.migrations', 'audit_trail.south_migrations'],
     url='https://github.com/TriplePoint-Software/audit_trail',
