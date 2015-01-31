@@ -254,6 +254,55 @@ class TestAuditTrail(TestCase):
             }
         })
 
+    def test_queryset_changes_reset_if_same_value(self):
+        model = TestModelTrackAllFields.objects.create(char='a')
+        self.assertEqual(AuditTrail.objects.all().count(), 1)
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
+        self.assertEqual(trail.get_changes(), {
+            'char': {
+                'old_value': '',
+                'new_value': 'a',
+                'field_label': 'Char'
+            }
+        })
+
+        model.char2 = 'b'
+        model.save()
+        self.assertEqual(AuditTrail.objects.all().count(), 2)
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
+        self.assertEqual(trail.get_changes(), {
+            'char2': {
+                'old_value': '',
+                'new_value': 'b',
+                'field_label': 'Char2'
+            }
+        })
+
+        model.char2 = ''
+        model.save()
+        self.assertEqual(AuditTrail.objects.all().count(), 3)
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
+        self.assertEqual(trail.get_changes(), {
+            'char2': {
+                'old_value': 'b',
+                'new_value': '',
+                'field_label': 'Char2'
+            }
+        })
+
+        trails = audit_trail.get_for_object(model)
+        self.assertEqual(len(trails.get_changes().keys()), 1)
+        self.assertEqual(trails.get_changes(), {
+            'char': {
+                'old_value': '',
+                'new_value': 'a',
+                'field_label': 'Char'
+            }
+        })
+
     def test_queryset_get_related_changes(self):
         """
         1. Create post

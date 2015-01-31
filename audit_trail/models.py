@@ -42,6 +42,11 @@ class AuditTrailQuerySet(models.QuerySet):
                 continue
 
             self._apply_field_changes(changes_dict, trail)
+        # Removing values that changed back
+        # F.e. 1->2->3->1 should not be showed as change with 1->1
+        for field, change in changes_dict.copy().items():
+            if change['old_value'] == change['new_value']:
+                del changes_dict[field]
 
         return changes_dict
 
