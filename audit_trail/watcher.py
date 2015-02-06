@@ -89,7 +89,7 @@ class AuditTrailWatcher(object):
             not_tracked_field = (self.fields is not None and field.name not in self.fields)
             if not_tracked_field or field.name in self.excluded_fields:
                 continue
-            data[field.name] = field.value_from_object(instance)
+            data[field.name] = field.to_python(field.value_from_object(instance))
         return data
 
     def get_changes(self, old_values, new_values):
