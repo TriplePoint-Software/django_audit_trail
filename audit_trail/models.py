@@ -82,8 +82,8 @@ class AuditTrailQuerySet(models.QuerySet):
         for field_name, field_change in trail.get_changes().items():
             if not field_name in changes_dict:
                 changes_dict[field_name] = field_change
-                continue
             changes_dict[field_name]['new_value'] = field_change['new_value']
+            changes_dict[field_name]['field_name'] = field_name
 
 
 class AuditTrailManager(models.Manager):

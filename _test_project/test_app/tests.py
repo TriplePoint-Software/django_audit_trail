@@ -217,12 +217,14 @@ class TestAuditTrail(TestCase):
             'char2': {
                 'old_value': '',
                 'new_value': 'b',
-                'field_label': 'Char2'
+                'field_label': 'Char2',
+                'field_name': 'char2'
             },
             'char': {
                 'old_value': '',
                 'new_value': 'a',
-                'field_label': 'Char'
+                'field_label': 'Char',
+                'field_name': 'char'
             }
         })
 
@@ -245,12 +247,14 @@ class TestAuditTrail(TestCase):
             'char2': {
                 'old_value': '',
                 'new_value': 'b',
-                'field_label': 'Char2'
+                'field_label': 'Char2',
+                'field_name': 'char2'
             },
             'char': {
                 'old_value': '',
                 'new_value': 'AAA',
-                'field_label': 'Char'
+                'field_label': 'Char',
+                'field_name': 'char'
             }
         })
 
@@ -299,7 +303,8 @@ class TestAuditTrail(TestCase):
             'char': {
                 'old_value': '',
                 'new_value': 'a',
-                'field_label': 'Char'
+                'field_label': 'Char',
+                'field_name': 'char',
             }
         })
 
@@ -342,7 +347,7 @@ class TestAuditTrail(TestCase):
             'field_label': u'Text',
             'new_value': u'',
             'old_value': u'comment 1 text',
-
+            'field_name': 'text'
         })
 
         comment2_changes = related_objects_changes[1]
@@ -353,6 +358,7 @@ class TestAuditTrail(TestCase):
             'field_label': u'Text',
             'new_value': u'comment 2 text change',
             'old_value': u'comment 2 text',
+            'field_name': 'text',
         })
 
         comment3_changes = related_objects_changes[2]
@@ -363,4 +369,5 @@ class TestAuditTrail(TestCase):
             'field_label': u'Text',
             'new_value': u'comment 3 text',
             'old_value': u'',
+            'field_name': 'text'
         })
