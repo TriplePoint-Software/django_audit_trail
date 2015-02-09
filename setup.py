@@ -1,6 +1,6 @@
 from setuptools import setup
 
-__version__ = "0.0.25"
+__version__ = "0.0.26"
 
 setup(
     name='django_audit_trail',
