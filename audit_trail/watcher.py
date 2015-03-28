@@ -34,7 +34,7 @@ class AuditTrailWatcher(object):
         self.track_only_with_related = track_only_with_related
         self.excluded_fields = ['id']
         if excluded_fields:
-            self.excluded_fields += self.excluded_fields
+            self.excluded_fields += excluded_fields
 
     def contribute_to_class(self, cls, name=None):
         if cls in self.__class__.tracked_models:
