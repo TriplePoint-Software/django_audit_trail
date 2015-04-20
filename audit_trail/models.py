@@ -154,6 +154,7 @@ class AuditTrail(models.Model):
 
     class Meta:
         ordering = ('-id',)
+        app_label = 'audit_trail'
 
     def __unicode__(self):
         return u'%s was %s at %s' % (self.object_repr, self.get_action_display().lower(), self.action_time.isoformat())

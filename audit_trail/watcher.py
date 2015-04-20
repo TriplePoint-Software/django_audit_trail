@@ -62,7 +62,7 @@ class AuditTrailWatcher(object):
             attribute = getattr(self.model_class, attr_name)
             if hasattr(attribute, 'related'):  # related object is queryset
                 related = attribute.related
-                related_model = related.model
+                related_model = related.related_model
                 related_field_name = related.field.name
             else:  # related object is FK
                 related_model = attribute.field.related_field.model
