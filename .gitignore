@@ -55,3 +55,6 @@ target/
 
 # IDE files
 .idea
+
+# Link in test project
+_test_project/audit_trail
