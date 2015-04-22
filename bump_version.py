@@ -38,7 +38,20 @@ def generate_version():
     subprocess.check_output(["git", 'tag', '%s' % new_version])
 
     print
-    print 'Version %s created. Push it to origin with "git push --tags"' % new_version
+    print 'Version %s created.' % new_version
+
+    push = raw_input('Do you want to push it to origin? YES/no: ')
+
+    if push:
+        deploy = raw_input('Do you want to deploy it to pypi? YES/no: ')
+
+        subprocess.check_output(["git", 'push'])
+        subprocess.check_output(["git", 'push', '--tags'])
+
+        if deploy:
+            subprocess.check_output(["python", 'setup.py', 'sdist',  'upload'])
+    else:
+        print 'Push it to origin with "git push --tags"'
 
 if __name__ == '__main__':
     generate_version()
