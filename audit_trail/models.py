@@ -139,7 +139,7 @@ class AuditTrail(models.Model):
     content_object = GenericForeignKey('content_type', 'object_id')
 
     user = models.ForeignKey(User, blank=True, null=True)
-    user_ip = models.IPAddressField(null=True)
+    user_ip = models.GenericIPAddressField(null=True)
 
     object_repr = models.CharField(max_length=200)
     action = models.PositiveSmallIntegerField(choices=ACTION_CHOICES)
