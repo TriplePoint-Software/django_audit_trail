@@ -3,7 +3,6 @@ from collections import OrderedDict
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.core.serializers.json import DjangoJSONEncoder
-from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.module_loading import import_string
@@ -11,6 +10,8 @@ from django.utils.module_loading import import_string
 from jsonfield import JSONField
 
 from utils import get_request
+
+User = settings.AUTH_USER_MODEL
 
 
 ENCODER_CLASS = DjangoJSONEncoder
