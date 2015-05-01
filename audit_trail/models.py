@@ -11,8 +11,6 @@ from jsonfield import JSONField
 
 from utils import get_request
 
-User = settings.AUTH_USER_MODEL
-
 
 ENCODER_CLASS = DjangoJSONEncoder
 if hasattr(settings, 'JSONFIELD_ENCODER'):
@@ -139,7 +137,7 @@ class AuditTrail(models.Model):
     object_id = models.TextField(blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    user = models.ForeignKey(User, blank=True, null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     user_ip = models.GenericIPAddressField(null=True)
 
     object_repr = models.CharField(max_length=200)
