@@ -1,0 +1,1 @@
+recursive-include audit_trail/templates *.html
