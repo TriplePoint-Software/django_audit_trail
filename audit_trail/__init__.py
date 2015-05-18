@@ -1,4 +1,4 @@
-# pylint: disable-msg=E1101
+# pylint: disable=E1101
 from django.contrib.contenttypes.models import ContentType
 from .watcher import AuditTrailWatcher
 from .models import AuditTrail
@@ -18,4 +18,4 @@ def get_for_object(obj):
 # pylint: disable=C0103
 default_app_config = 'audit_trail.app.AuditTrailAppConfig'
 
-__all__ = ['audit_trail_watch', 'get_for_object', 'default_app_config']
+__all__ = ('audit_trail_watch', 'get_for_object', 'default_app_config')
