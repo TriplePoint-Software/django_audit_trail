@@ -29,3 +29,5 @@ Model history tracking
 **track_related** - track related objects changes
 
 [![Code Health](https://landscape.io/github/TriplePoint-Software/django_audit_trail/master/landscape.svg?style=flat)](https://landscape.io/github/TriplePoint-Software/django_audit_trail/master)
+
+[![Code Issues](http://www.quantifiedcode.com/api/v1/project/88c190ebca044e088164a8d95255f85c/badge.svg)](http://www.quantifiedcode.com/app/project/88c190ebca044e088164a8d95255f85c)
