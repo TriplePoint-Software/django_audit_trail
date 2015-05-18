@@ -1,6 +1,6 @@
 # myapp/apps.py
 from django.apps import AppConfig
-from signals import audit_trail_app_ready
+from .signals import audit_trail_app_ready
 
 
 class AuditTrailAppConfig(AppConfig):

@@ -9,15 +9,15 @@ from django.utils.module_loading import import_string
 
 from jsonfield import JSONField
 
-from utils import get_request
+from .utils import get_request
 
 
-ENCODER_CLASS = DjangoJSONEncoder
+EncoderClass = DjangoJSONEncoder
 if hasattr(settings, 'JSONFIELD_ENCODER'):
-    ENCODER_CLASS = import_string(getattr(settings, 'JSONFIELD_ENCODER'))
+    EncoderClass = import_string(getattr(settings, 'JSONFIELD_ENCODER'))
 
-dump_kwargs = {
-    'cls': ENCODER_CLASS,
+DUMP_KWARGS = {
+    'cls': EncoderClass,
     'separators': (',', ':')
 }
 
@@ -79,7 +79,7 @@ class AuditTrailQuerySet(models.QuerySet):
 
     def _apply_field_changes(self, changes_dict, trail):
         for field_name, field_change in trail.get_changes().items():
-            if not field_name in changes_dict:
+            if field_name not in changes_dict:
                 changes_dict[field_name] = field_change
             changes_dict[field_name]['new_value'] = field_change['new_value']
             changes_dict[field_name]['field_name'] = field_name
@@ -145,7 +145,7 @@ class AuditTrail(models.Model):
     action_time = models.DateTimeField(auto_now=True)
 
     # pylint: disable-msg=E1123
-    changes = JSONField(dump_kwargs=dump_kwargs)
+    changes = JSONField(dump_kwargs=DUMP_KWARGS)
 
     related_trail = models.ForeignKey(to='self', null=True)
 

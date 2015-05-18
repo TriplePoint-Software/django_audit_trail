@@ -1,7 +1,7 @@
 # pylint: disable-msg=E1101
 from django.contrib.contenttypes.models import ContentType
-from watcher import AuditTrailWatcher
-from models import AuditTrail
+from .watcher import AuditTrailWatcher
+from .models import AuditTrail
 
 
 def audit_trail_watch(cls, **kwargs):
@@ -14,7 +14,8 @@ def get_for_object(obj):
     content_type = ContentType.objects.get_for_model(obj)
     return AuditTrail.objects.filter(content_type=content_type, object_id=obj.id)
 
-
+# C0103 / Invalid constant name "default_app_config"
+# pylint: disable=C0103
 default_app_config = 'audit_trail.app.AuditTrailAppConfig'
 
 __all__ = ['audit_trail_watch', 'get_for_object', 'default_app_config']

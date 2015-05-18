@@ -49,7 +49,7 @@ def generate_version():
         subprocess.check_output(["git", 'push', '--tags'])
 
         if (deploy or 'YES').lower() == 'yes':
-            subprocess.check_output(["python", 'setup.py', 'sdist',  'upload'])
+            subprocess.check_output(["python", 'setup.py', 'sdist', 'upload'])
     else:
         print 'Push it to origin with "git push --tags"'
 

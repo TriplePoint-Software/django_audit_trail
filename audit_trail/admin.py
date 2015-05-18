@@ -15,8 +15,8 @@ class ContentTypeFilter(SimpleListFilter):
     def lookups(self, request, model_admin):
         result = []
         for model in AuditTrailWatcher.tracked_models:
-            ct = ContentType.objects.get_for_model(model)
-            result.append((ct.id, ct.name))
+            content_type = ContentType.objects.get_for_model(model)
+            result.append((content_type.id, content_type.name))
         return result
 
     def queryset(self, request, queryset):
@@ -32,14 +32,15 @@ def action(audit_trail):
         AuditTrail.ACTIONS.CREATED: '#27DE55',
         AuditTrail.ACTIONS.UPDATED: '#FFFF84',
     }
+    row_template = u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">%s</div>'
 
     if audit_trail.action in [AuditTrail.ACTIONS.CREATED, AuditTrail.ACTIONS.UPDATED, AuditTrail.ACTIONS.DELETED]:
-        return u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">%s</div>' % (
-            colors[audit_trail.action], audit_trail.get_action_display()
-        )
+
+        return row_template % (colors[audit_trail.action], audit_trail.get_action_display())
     if audit_trail.is_related_changed:
-        return u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">Related %s</div>' % (
-            colors[audit_trail.related_trail.action], audit_trail.related_trail.get_action_display().lower()
+        return row_template % (
+            colors[audit_trail.related_trail.action],
+            u'Related ' + audit_trail.related_trail.get_action_display().lower()
         )
 
 
@@ -77,6 +78,6 @@ class AuditTrailAdmin(admin.ModelAdmin):
 
     format_json_values.short_description = 'Changes'
     format_json_values.allow_tags = True
-    
+
 
 admin.site.register(AuditTrail, AuditTrailAdmin)

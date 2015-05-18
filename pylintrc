@@ -45,7 +45,17 @@ load-plugins=pylint_django
 # C0304: Final newline missing
 # R0201: Method could be a function
 # E1103: Instance of 'WSGIRequest' has no 'context' member (but some types could not be inferred)
-disable=C0111, R0904, W5101, W0142, I0011, R0901, E1123, E1120, C0304, R0201, E1103
+# W0232: Class has no __init__ method
+# C0103: Invalid constant name urlpatterns
+# C1001: Old-style class defined. (Meta)
+# W0613: Unused argument %s. F.e. post_save signal use sender as first argument. But we don't use it in 99%
+# E0202: Method hidden doesn't work well with json.JSONEncoder
+#        Remove when fixed https://bitbucket.org/logilab/pylint/issue/414/false-positive-for-e0202-method-hidden
+# W0704: pointless-except. Doesn't work well. F.e. accounts/json_datetime.py:31
+# W0212: protected-access. Access to a protected member _meta of a client class :(
+#
+# F0401: Disables import error. Useful when testing only one app.
+disable=C0111, R0904, W5101, W0142, I0011, R0901, E1123, E1120, C0304, R0201, E1103, W0232, C1001, W0613, E0202, W0704, W0212
 
 
 
@@ -95,7 +105,7 @@ msg-template={msg_id}:{line:3d},{column}: {obj}: {msg}
 init-import=no
 
 # A regular expression matching names used for dummy variables (i.e. not used).
-dummy-variables-rgx=_|dummy
+dummy-variables-rgx=_|dummy|kwargs|args
 
 # List of additional names supposed to be defined in builtins. Remember that
 # you should avoid to define new builtins when possible.
@@ -143,7 +153,11 @@ no-docstring-rgx=__.*__
 module-rgx=(([a-z_][a-z0-9_]*)|([A-Z][a-zA-Z0-9]+))$
 
 # Regular expression which should only match correct module level names
-const-rgx=(([A-Z_][A-Z1-9_]*)|(__.*__))$
+# Added urlpattens and register to avoid errors in admin.py and urls.py
+# Added [A-Z_][a-zA-Z0-9]+ to match class name as constant (AgentDocumentsSignupFormSet = inlineformset_factory(...))
+const-rgx=(([A-Z_][A-Z1-9_]*)|(__.*__)|(urlpatterns)|(register)|([A-Z_][a-zA-Z0-9]+))$
+
+
 
 # Regular expression which should only match correct class names
 class-rgx=[A-Z_][a-zA-Z0-9]+$
@@ -155,7 +169,7 @@ function-rgx=[a-z_][a-z0-9_]{2,30}$
 method-rgx=[a-z_][a-z0-9_]{2,50}$
 
 # Regular expression which should only match correct instance attribute names
-attr-rgx=[a-z_][a-z0-9_]{2,30}$
+attr-rgx=[a-z_][a-z0-9_]{1,30}$
 
 # Regular expression which should only match correct argument names
 argument-rgx=[a-z_][a-z0-9_]{2,30}$
