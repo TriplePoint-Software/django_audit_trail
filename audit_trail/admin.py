@@ -1,4 +1,4 @@
-# pylint: disable-msg=E1002,E1101
+# pylint: disable=E1002,E1101
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter

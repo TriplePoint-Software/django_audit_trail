@@ -1,4 +1,4 @@
-# pylint: disable-msg=E1101,W0403,C0111,R0201
+# pylint: disable=E1101,W0403,C0111,R0201
 from collections import OrderedDict
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -144,7 +144,7 @@ class AuditTrail(models.Model):
     action = models.PositiveSmallIntegerField(choices=ACTION_CHOICES)
     action_time = models.DateTimeField(auto_now=True)
 
-    # pylint: disable-msg=E1123
+    # pylint: disable=E1123
     changes = JSONField(dump_kwargs=DUMP_KWARGS)
 
     related_trail = models.ForeignKey(to='self', null=True)

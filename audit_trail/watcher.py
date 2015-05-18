@@ -119,11 +119,11 @@ class AuditTrailWatcher(object):
         return diff
 
     def on_post_init(self, instance, sender, **kwargs):
-        """ Stores original field values. """
+        """Stores original field values."""
         instance._original_values = self.serialize_object(instance)
 
     def on_post_save_create(self, instance, sender, created, **kwargs):
-        """ Saves object's data. """
+        """Saves object's data."""
         if getattr(settings, 'DISABLE_AUDIT_TRAIL', False):
             return
 
