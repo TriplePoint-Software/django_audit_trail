@@ -28,4 +28,4 @@ Model history tracking
 **track_deletion** — track model deletion, default True  
 **track_related** - track related objects changes
 
-[![Code Health](https://landscape.io/github/TriplePoint-Software/django_audit_trail/master/landscape.svg?style=flat)](https://landscape.io/github/TriplePoint-Software/django_audit_trail/master
+[![Code Health](https://landscape.io/github/TriplePoint-Software/django_audit_trail/master/landscape.svg?style=flat)](https://landscape.io/github/TriplePoint-Software/django_audit_trail/master)
