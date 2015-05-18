@@ -83,3 +83,18 @@ class Comment1(models.Model):
 
 audit_trail_watch(Post1)
 audit_trail_watch(Comment1)
+
+
+
+# Test FK object changing
+class Animal(models.Model):
+    name = models.CharField(max_length=12)
+
+    def __unicode__(self):
+        return self.name
+
+
+class Person(models.Model):
+    pet = models.ForeignKey(Animal, null=True)
+
+    audit = AuditTrailWatcher()

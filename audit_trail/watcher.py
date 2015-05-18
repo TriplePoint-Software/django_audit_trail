@@ -1,6 +1,6 @@
 # coding=utf-8
 from django.conf import settings
-from django.db.models import signals
+from django.db.models import signals, ForeignKey
 from django.dispatch import receiver
 from .models import AuditTrail
 from .signals import audit_trail_app_ready
@@ -92,7 +92,7 @@ class AuditTrailWatcher(object):
             not_tracked_field = (self.fields is not None and field.name not in self.fields)
             if not_tracked_field or field.name in self.excluded_fields:
                 continue
-            data[field.name] = field.to_python(field.value_from_object(instance))
+            data[field.name] = field.value_from_object(instance)
         return data
 
     def get_changes(self, old_values, new_values):
@@ -100,23 +100,33 @@ class AuditTrailWatcher(object):
         diff = {}
         old_values = old_values or {}
         new_values = new_values or {}
-        fields = self.fields or [field.name for field in self.model_class._meta.fields]
+        fields = self.fields or [field_name.name for field_name in self.model_class._meta.fields]
 
-        for field in fields:
-            old_value = old_values.get(field, '')
-            new_value = new_values.get(field, '')
+        for field_name in fields:
+            old_value = old_values.get(field_name, None)
+            new_value = new_values.get(field_name, None)
 
-            if old_value is None:
-                old_value = ''
+            field = self.model_class._meta.get_field(field_name)
+            if isinstance(field, ForeignKey) and old_value is not None:
+                try:
+                    old_value = int(old_value)
+                    old_value = self.get_fk_value(field_name, old_value)
+                except ValueError:
+                    pass
 
-            if new_value is None:
-                new_value = ''
+            if isinstance(field, ForeignKey) and new_value is not None:
+                new_value = self.get_fk_value(field_name, new_value)
+
             if old_value != new_value:
-                diff[field] = {
+                diff[field_name] = {
                     'old_value': old_value,
                     'new_value': new_value
                 }
         return diff
+
+    def get_fk_value(self, field_name, value):
+        string = unicode(getattr(self.model_class(**{'%s_id' % field_name: value}), field_name))
+        return '[#%d] %s' % (value, string)
 
     def on_post_init(self, instance, sender, **kwargs):
         """Stores original field values."""

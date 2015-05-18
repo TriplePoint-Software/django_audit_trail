@@ -3,7 +3,7 @@ from django.test import TestCase
 import audit_trail
 from audit_trail.models import AuditTrail
 from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, \
-    Post, Comment, User, AA, AB, BB, ShortcutTestModel, Post1, Comment1
+    Post, Comment, User, AA, AB, BB, ShortcutTestModel, Post1, Comment1, Person, Animal
 
 
 class TestAuditTrail(TestCase):
@@ -14,7 +14,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
         self.assertEqual(trail.get_changes(), {
             'char': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'a',
                 'field_label': 'Char'
             }
@@ -31,7 +31,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.get_changes(), {
             'char': {
                 'old_value': 'a',
-                'new_value': '',
+                'new_value': None,
                 'field_label': 'Char'
             }
         })
@@ -175,7 +175,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
         self.assertEqual(trail.get_changes(), {
             'name': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'a',
                 'field_label': 'Name'
             }
@@ -193,7 +193,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
         self.assertEqual(trail.get_changes(), {
             'char': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'a',
                 'field_label': 'Char'
             }
@@ -206,7 +206,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
         self.assertEqual(trail.get_changes(), {
             'char2': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'b',
                 'field_label': 'Char2'
             }
@@ -215,13 +215,13 @@ class TestAuditTrail(TestCase):
         trails = audit_trail.get_for_object(model)
         self.assertEqual(trails.get_changes(), {
             'char2': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'b',
                 'field_label': 'Char2',
                 'field_name': 'char2'
             },
             'char': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'a',
                 'field_label': 'Char',
                 'field_name': 'char'
@@ -245,13 +245,13 @@ class TestAuditTrail(TestCase):
         trails = audit_trail.get_for_object(model)
         self.assertEqual(trails.get_changes(), {
             'char2': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'b',
                 'field_label': 'Char2',
                 'field_name': 'char2'
             },
             'char': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'AAA',
                 'field_label': 'Char',
                 'field_name': 'char'
@@ -265,7 +265,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
         self.assertEqual(trail.get_changes(), {
             'char': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'a',
                 'field_label': 'Char'
             }
@@ -278,13 +278,13 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
         self.assertEqual(trail.get_changes(), {
             'char2': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'b',
                 'field_label': 'Char2'
             }
         })
 
-        model.char2 = ''
+        model.char2 = None
         model.save()
         self.assertEqual(AuditTrail.objects.all().count(), 3)
         trail = AuditTrail.objects.all()[0]
@@ -292,16 +292,17 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.get_changes(), {
             'char2': {
                 'old_value': 'b',
-                'new_value': '',
+                'new_value': None,
                 'field_label': 'Char2'
             }
         })
 
         trails = audit_trail.get_for_object(model)
+
         self.assertEqual(len(trails.get_changes().keys()), 1)
         self.assertEqual(trails.get_changes(), {
             'char': {
-                'old_value': '',
+                'old_value': None,
                 'new_value': 'a',
                 'field_label': 'Char',
                 'field_name': 'char',
@@ -345,7 +346,7 @@ class TestAuditTrail(TestCase):
         self.assertEqual(comment1_changes['model'], 'test_app.comment')
         self.assertEqual(comment1_changes['changes']['text'], {
             'field_label': u'Text',
-            'new_value': u'',
+            'new_value': None,
             'old_value': u'comment 1 text',
             'field_name': 'text'
         })
@@ -368,6 +369,54 @@ class TestAuditTrail(TestCase):
         self.assertEqual(comment3_changes['changes']['text'], {
             'field_label': u'Text',
             'new_value': u'comment 3 text',
-            'old_value': u'',
+            'old_value': None,
             'field_name': 'text'
         })
+
+    def test_related_object_change(self):
+        dog = Animal.objects.create(name='Dog')
+        snake = Animal.objects.create(name='Snake')
+
+        man = Person.objects.create()
+        man.pet = dog
+        man.save()
+
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
+        self.assertEqual(trail.get_changes(), {
+            'pet': {
+                'old_value': None,
+                'new_value': u'[#%d] Dog' % dog.id,
+                'field_label': u'Pet'
+            }
+        })
+
+        man.pet = snake
+        man.save()
+
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
+        self.assertEqual(trail.get_changes(), {
+            'pet': {
+                'old_value': u'[#%d] Dog' % dog.id,
+                'new_value': u'[#%d] Snake' % snake.id,
+                'field_label': u'Pet'
+            }
+        })
+
+        man.pet = None
+        man.save()
+
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
+        self.assertEqual(trail.get_changes(), {
+            'pet': {
+                'old_value': u'[#%d] Snake' % snake.id,
+                'new_value': None,
+                'field_label': u'Pet'
+            }
+        })
+
+    # Todo:
+    #   fill default values
+    #   values from choices
