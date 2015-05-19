@@ -1,5 +1,6 @@
 # coding=utf-8
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import signals, ForeignKey
 from django.dispatch import receiver
 from .models import AuditTrail
@@ -129,7 +130,11 @@ class AuditTrailWatcher(object):
         value = int(value)
 
         instance = self.model_class(**{'%s_id' % field_name: value})
-        string = unicode(getattr(instance, field_name))
+        try:
+            string = unicode(getattr(instance, field_name))
+        except ObjectDoesNotExist:
+            return '[#%d] Deleted'
+
         return '[#%d] %s' % (value, string)
 
     def get_choice_value(self, field_name, value):

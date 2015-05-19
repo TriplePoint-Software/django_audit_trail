@@ -93,7 +93,7 @@ class AuditTrailManager(models.Manager):
         audit_trail = self.model(
             content_type=ContentType.objects.get_for_model(instance),
             object_id=instance.id,
-            object_repr=unicode(instance),
+            object_repr=unicode(instance)[:200],
             action=action
         )
 
