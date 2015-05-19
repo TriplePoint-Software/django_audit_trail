@@ -98,3 +98,10 @@ class Person(models.Model):
     pet = models.ForeignKey(Animal, null=True)
 
     audit = AuditTrailWatcher()
+
+# Test Values with changes
+
+class SomePerson(models.Model):
+    season = models.IntegerField(default=0, choices=((0, 'Winter'), (1, 'Spring'), (2, 'Summer'), (3, 'Autumn')))
+
+    audit = AuditTrailWatcher()

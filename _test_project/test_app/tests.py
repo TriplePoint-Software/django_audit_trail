@@ -3,7 +3,7 @@ from django.test import TestCase
 import audit_trail
 from audit_trail.models import AuditTrail
 from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, \
-    Post, Comment, User, AA, AB, BB, ShortcutTestModel, Post1, Comment1, Person, Animal
+    Post, Comment, User, AA, AB, BB, ShortcutTestModel, Post1, Comment1, Person, Animal, SomePerson
 
 
 class TestAuditTrail(TestCase):
@@ -417,6 +417,14 @@ class TestAuditTrail(TestCase):
             }
         })
 
-    # Todo:
-    #   fill default values
-    #   values from choices
+    def test_values_with_choices(self):
+        person = SomePerson.objects.create()
+        trail = AuditTrail.objects.all()[0]
+        self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
+        self.assertEqual(trail.get_changes(), {
+            'season': {
+                'old_value': None,
+                'new_value': u'[#0] ' + person.get_season_display(),
+                'field_label': u'Season'
+            }
+        })
