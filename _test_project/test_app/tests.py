@@ -386,7 +386,8 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.get_changes(), {
             'pet': {
                 'old_value': None,
-                'new_value': u'[#%d] Dog' % dog.id,
+                'new_value': unicode(dog.id),
+                # 'new_value_string': u'[#%d] Dog' % dog.id,
                 'field_label': u'Pet'
             }
         })
@@ -398,8 +399,10 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
         self.assertEqual(trail.get_changes(), {
             'pet': {
-                'old_value': u'[#%d] Dog' % dog.id,
-                'new_value': u'[#%d] Snake' % snake.id,
+                'old_value': unicode(dog.id),
+                # 'old_value_string': u'[#%d] Dog' % dog.id,
+                'new_value': unicode(snake.id),
+                # 'new_value': u'[#%d] Snake' % snake.id,
                 'field_label': u'Pet'
             }
         })
@@ -411,7 +414,8 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.action, AuditTrail.ACTIONS.UPDATED)
         self.assertEqual(trail.get_changes(), {
             'pet': {
-                'old_value': u'[#%d] Snake' % snake.id,
+                'old_value': unicode(snake.id),
+                # 'old_value': u'[#%d] Snake' % snake.id,
                 'new_value': None,
                 'field_label': u'Pet'
             }
@@ -424,7 +428,8 @@ class TestAuditTrail(TestCase):
         self.assertEqual(trail.get_changes(), {
             'season': {
                 'old_value': None,
-                'new_value': u'[#0] ' + person.get_season_display(),
+                'new_value': '0',
+                # 'new_value': u'[#0] ' + person.get_season_display(),
                 'field_label': u'Season'
             }
         })

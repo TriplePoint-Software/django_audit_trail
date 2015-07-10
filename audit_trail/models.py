@@ -98,7 +98,7 @@ class AuditTrailManager(models.Manager):
         )
 
         request = get_request(['user', 'META'])
-        if request:
+        if request and hasattr(request, 'user'):
             if request.user.is_authenticated():
                 audit_trail.user = request.user
             audit_trail.user_ip = request.META.get('HTTP_X_FORWARDED_FOR', None) or request.META.get('REMOTE_ADDR')

@@ -107,14 +107,20 @@ class AuditTrailWatcher(object):
             old_value = old_values.get(field_name, None)
             new_value = new_values.get(field_name, None)
 
-            field = self.model_class._meta.get_field(field_name)
-            if isinstance(field, ForeignKey):
-                old_value = self.get_fk_value(field_name, old_value)
-                new_value = self.get_fk_value(field_name, new_value)
+            if old_value is not None:
+                old_value = unicode(old_value)
 
-            if field.choices:
-                old_value = self.get_choice_value(field_name, old_value)
-                new_value = self.get_choice_value(field_name, new_value)
+            if new_value is not None:
+                new_value = unicode(new_value)
+
+            # field = self.model_class._meta.get_field(field_name)
+            # if isinstance(field, ForeignKey):
+            #     old_value = self.get_fk_value(field_name, old_value)
+            #     new_value = self.get_fk_value(field_name, new_value)
+            #
+            # if field.choices:
+            #     old_value = self.get_choice_value(field_name, old_value)
+            #     new_value = self.get_choice_value(field_name, new_value)
 
             if old_value != new_value:
                 diff[field_name] = {
@@ -141,8 +147,7 @@ class AuditTrailWatcher(object):
         if value is None:
             return None
         instance = self.model_class(**{field_name: value})
-        return u'[#%s] %s' % (
-            unicode(value),
+        return u'%s' % (
             unicode(getattr(instance, 'get_%s_display' % field_name)())
         )
 
