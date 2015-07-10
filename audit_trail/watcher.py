@@ -8,7 +8,6 @@ from .signals import audit_trail_app_ready
 
 
 class AuditTrailWatcher(object):
-
     u"""
     Watcher class that tracks post_save and post_delete signals and generates AuditTrail records.
 
