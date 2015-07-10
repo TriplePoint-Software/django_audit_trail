@@ -2,7 +2,7 @@ import datetime
 from django.test import TestCase
 import audit_trail
 from audit_trail.models import AuditTrail
-from .models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, \
+from ..models import TestModelTrackAllFields, TestModelTrackOneField, TestModelWithFieldLabels, \
     Post, Comment, User, AA, AB, BB, ShortcutTestModel, Post1, Comment1, Person, Animal, SomePerson
 
 
@@ -120,7 +120,7 @@ class TestAuditTrail(TestCase):
     def test_field_labels(self):
         TestModelWithFieldLabels.objects.create(char='a', char2='x', char_3='1')
         trail = AuditTrail.objects.all()[0]
-        
+
         self.assertEqual(trail.get_changes()['char']['field_label'], 'Char 1')
         self.assertEqual(trail.get_changes()['char2']['field_label'], 'Char 2')
         self.assertEqual(trail.get_changes()['char_3']['field_label'], 'Char 3')

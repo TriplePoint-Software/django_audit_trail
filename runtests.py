@@ -13,7 +13,7 @@ DEFAULT_SETTINGS = dict(
         'django.contrib.auth',
 
         'audit_trail',
-        '_test_project.test_app',
+        '_test_project.app',
     ),
     DATABASES={
         "default": {
@@ -39,7 +39,7 @@ def runtests():
         from django.test.runner import DiscoverRunner
 
         runner_class = DiscoverRunner
-        test_args = ['_test_project.test_app']
+        test_args = ['_test_project.app']
     except ImportError:
         # Disabled
         # - pylint: E0611 / No name 'simple' in module 'django.test'
