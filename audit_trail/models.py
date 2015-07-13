@@ -82,6 +82,7 @@ class AuditTrailQuerySet(models.QuerySet):
             if field_name not in changes_dict:
                 changes_dict[field_name] = field_change
             changes_dict[field_name]['new_value'] = field_change['new_value']
+            changes_dict[field_name]['new_value_string'] = field_change['new_value_string']
             changes_dict[field_name]['field_name'] = field_name
 
 
@@ -98,7 +99,7 @@ class AuditTrailManager(models.Manager):
         )
 
         request = get_request(['user', 'META'])
-        if request:
+        if request and hasattr(request, 'user'):
             if request.user.is_authenticated():
                 audit_trail.user = request.user
             audit_trail.user_ip = request.META.get('HTTP_X_FORWARDED_FOR', None) or request.META.get('REMOTE_ADDR')

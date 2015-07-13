@@ -1,15 +1,14 @@
 # coding=utf-8
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import signals, ForeignKey
+from django.db.models import signals
 from django.dispatch import receiver
 from .models import AuditTrail
 from .signals import audit_trail_app_ready
+from stringifier import ModelFieldStringifier
 
 
 class AuditTrailWatcher(object):
-
-    u"""
+    """
     Watcher class that tracks post_save and post_delete signals and generates AuditTrail records.
 
     Attributs:
@@ -21,7 +20,7 @@ class AuditTrailWatcher(object):
 
     def __init__(self, fields=None, track_related=None, notify_related=None,
                  track_only_with_related=False, excluded_fields=None):
-        u"""
+        """
         Constructor
 
         :param fields: list fields that should be tracked. If None — all fields will be tracked.
@@ -108,43 +107,24 @@ class AuditTrailWatcher(object):
             new_value = new_values.get(field_name, None)
 
             field = self.model_class._meta.get_field(field_name)
-            if isinstance(field, ForeignKey):
-                old_value = self.get_fk_value(field_name, old_value)
-                new_value = self.get_fk_value(field_name, new_value)
 
-            if field.choices:
-                old_value = self.get_choice_value(field_name, old_value)
-                new_value = self.get_choice_value(field_name, new_value)
+            old_value_string = ModelFieldStringifier.stringify(field, old_value)
+            new_value_string = ModelFieldStringifier.stringify(field, new_value)
+
+            if old_value is not None:
+                old_value = unicode(old_value)
+
+            if new_value is not None:
+                new_value = unicode(new_value)
 
             if old_value != new_value:
                 diff[field_name] = {
                     'old_value': old_value,
-                    'new_value': new_value
+                    'old_value_string': old_value_string,
+                    'new_value': new_value,
+                    'new_value_string': new_value_string
                 }
         return diff
-
-    def get_fk_value(self, field_name, value):
-        if value is None:
-            return None
-
-        value = int(value)
-
-        instance = self.model_class(**{'%s_id' % field_name: value})
-        try:
-            string = unicode(getattr(instance, field_name))
-        except ObjectDoesNotExist:
-            return '[#%d] Deleted'
-
-        return '[#%d] %s' % (value, string)
-
-    def get_choice_value(self, field_name, value):
-        if value is None:
-            return None
-        instance = self.model_class(**{field_name: value})
-        return u'[#%s] %s' % (
-            unicode(value),
-            unicode(getattr(instance, 'get_%s_display' % field_name)())
-        )
 
     def on_post_init(self, instance, sender, **kwargs):
         """Stores original field values."""

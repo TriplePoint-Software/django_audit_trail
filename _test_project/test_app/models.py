@@ -85,7 +85,6 @@ audit_trail_watch(Post1)
 audit_trail_watch(Comment1)
 
 
-
 # Test FK object changing
 class Animal(models.Model):
     name = models.CharField(max_length=12)
@@ -99,9 +98,35 @@ class Person(models.Model):
 
     audit = AuditTrailWatcher()
 
-# Test Values with changes
 
+# Test Values with changes
 class SomePerson(models.Model):
+    name = models.CharField(default="John", max_length=16)
     season = models.IntegerField(default=0, choices=((0, 'Winter'), (1, 'Spring'), (2, 'Summer'), (3, 'Autumn')))
 
+    def __unicode__(self):
+        return self.name
+
     audit = AuditTrailWatcher()
+
+
+# Test stringifier
+
+class AzazaField(models.CharField):
+    def __init__(self, *args, **kwargs):
+        kwargs['max_length'] = 255
+        super(AzazaField, self).__init__(*args, **kwargs)
+
+class TestStringifierModel(models.Model):
+    char = models.CharField(max_length=255, null=True)
+    integer = models.IntegerField(null=True)
+    datetime = models.DateTimeField(null=True)
+    date = models.DateField(null=True)
+    fk = models.ForeignKey(SomePerson, null=True)
+    boolean = models.BooleanField(null=True)
+    float = models.FloatField(null=True)
+    choice = models.PositiveIntegerField(null=True, choices=((0, 'Good choice'),))
+    azaza = AzazaField(null=True)
+
+    audit = AuditTrailWatcher()
+
