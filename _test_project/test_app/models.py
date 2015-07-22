@@ -101,7 +101,7 @@ class Person(models.Model):
 
 # Test Values with changes
 class SomePerson(models.Model):
-    name = models.CharField(default="John", max_length=16)
+    name = models.CharField(default="", max_length=16)
     season = models.IntegerField(default=0, choices=((0, 'Winter'), (1, 'Spring'), (2, 'Summer'), (3, 'Autumn')))
 
     def __unicode__(self):

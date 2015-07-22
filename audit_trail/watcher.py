@@ -1,6 +1,6 @@
 # coding=utf-8
 from django.conf import settings
-from django.db.models import signals
+from django.db.models import signals, NOT_PROVIDED
 from django.dispatch import receiver
 from .models import AuditTrail
 from .signals import audit_trail_app_ready
@@ -103,10 +103,14 @@ class AuditTrailWatcher(object):
         fields = self.fields or [field_name.name for field_name in self.model_class._meta.fields]
 
         for field_name in fields:
-            old_value = old_values.get(field_name, None)
-            new_value = new_values.get(field_name, None)
-
             field = self.model_class._meta.get_field(field_name)
+
+            default = None
+            if field.default!=NOT_PROVIDED:
+                default = field.default
+
+            old_value = old_values.get(field_name, default)
+            new_value = new_values.get(field_name, None)
 
             old_value_string = ModelFieldStringifier.stringify(field, old_value)
             new_value_string = ModelFieldStringifier.stringify(field, new_value)

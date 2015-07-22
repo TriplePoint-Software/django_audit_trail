@@ -467,14 +467,13 @@ class TestAuditTrail(TestCase):
         })
 
     def test_values_with_choices(self):
-        person = SomePerson.objects.create()
+        person = SomePerson.objects.create(season="1")
         trail = AuditTrail.objects.all()[0]
         self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
-
         self.assertEqual(trail.get_changes()['season'], {
-            'old_value': None,
-            'old_value_string': None,
-            'new_value': '0',
-            'new_value_string': person.get_season_display(),
-            'field_label': u'Season'
+            'new_value_string': '1',
+            'new_value': '1',
+            'old_value_string': 'Winter',
+            'old_value': '0',
+            'field_label': 'Season'
         })

@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import IntegerField
 from django.utils import formats
 
 
@@ -26,6 +27,9 @@ class ModelFieldStringifier(object):
 
         if value is None:
             return None
+
+        if isinstance(field, IntegerField):
+            value = int(value)
 
         if getattr(field, 'choices', None):
             try:
