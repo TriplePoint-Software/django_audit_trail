@@ -106,7 +106,7 @@ class AuditTrailWatcher(object):
             field = self.model_class._meta.get_field(field_name)
 
             default = None
-            if field.default!=NOT_PROVIDED:
+            if field.default != NOT_PROVIDED:
                 default = field.default
 
             old_value = old_values.get(field_name, default)

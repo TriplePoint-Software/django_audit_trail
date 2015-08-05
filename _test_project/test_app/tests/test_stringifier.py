@@ -5,6 +5,7 @@ from audit_trail.stringifier import ModelFieldStringifier
 from ..models import TestStringifierModel, SomePerson, AzazaField
 from audit_trail.models import AuditTrail
 
+
 class TestModelDefaultFieldStringifier(TestCase):
     def get_field(self, field_name):
         return TestStringifierModel._meta.get_field(field_name)
@@ -24,7 +25,8 @@ class TestModelDefaultFieldStringifier(TestCase):
     def test_datetime_field(self):
         now = datetime.datetime.now()
         tsm = TestStringifierModel(datetime=now)
-        self.assertEqual(ModelFieldStringifier.stringify(self.get_field('datetime'), tsm.datetime), formats.date_format(now, "DATETIME_FORMAT"))
+        self.assertEqual(ModelFieldStringifier.stringify(self.get_field('datetime'), tsm.datetime),
+                         formats.date_format(now, "DATETIME_FORMAT"))
 
     def test_datetime_field_null(self):
         tsm = TestStringifierModel.objects.create()
@@ -33,7 +35,8 @@ class TestModelDefaultFieldStringifier(TestCase):
     def test_date_field(self):
         today = datetime.date.today()
         tsm = TestStringifierModel(date=today)
-        self.assertEqual(ModelFieldStringifier.stringify(self.get_field('date'), tsm.date), formats.date_format(today, "DATE_FORMAT"))
+        self.assertEqual(ModelFieldStringifier.stringify(self.get_field('date'), tsm.date),
+                         formats.date_format(today, "DATE_FORMAT"))
 
     def test_fk_field(self):
         person = SomePerson.objects.create()
@@ -59,14 +62,15 @@ class TestModelDefaultFieldStringifier(TestCase):
 
     def test_choices(self):
         tsm = TestStringifierModel(choice=0)
-        self.assertEqual(ModelFieldStringifier.stringify(self.get_field('choice'), tsm.choice), tsm.get_choice_display())
+        self.assertEqual(ModelFieldStringifier.stringify(self.get_field('choice'), tsm.choice),
+                         tsm.get_choice_display())
 
 
 def stringify_azaza_field(value, *args):
     return u'Azaza %s' % unicode(value)
 
-class TestExtendModelDefaultFieldStringifier(TestCase):
 
+class TestExtendModelDefaultFieldStringifier(TestCase):
     def test_add_custom_stringifier(self):
         self.assertNotIn(AzazaField, ModelFieldStringifier.custom_stringify_methods)
         ModelFieldStringifier.add_stringifier(AzazaField, stringify_azaza_field)

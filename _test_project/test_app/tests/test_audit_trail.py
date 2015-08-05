@@ -471,7 +471,7 @@ class TestAuditTrail(TestCase):
         trail = AuditTrail.objects.all()[0]
         self.assertEqual(trail.action, AuditTrail.ACTIONS.CREATED)
         self.assertEqual(trail.get_changes()['season'], {
-            'new_value_string': '1',
+            'new_value_string': 'Spring',
             'new_value': '1',
             'old_value_string': 'Winter',
             'old_value': '0',
