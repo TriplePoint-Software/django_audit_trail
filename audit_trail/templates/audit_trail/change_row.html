@@ -14,7 +14,7 @@
     {% if audit_trail.is_updated %}
         <td style="width: 30px">→</td>
     {% endif %}
-    {% if audit_trail.is_updated or audit_trail.created %}
+    {% if audit_trail.is_updated or audit_trail.is_created %}
         <td>{{ change.new_value }}</td>
     {% endif %}
 </tr>
