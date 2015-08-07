@@ -51,6 +51,11 @@ class ModelFieldStringifier(object):
     def stringify_date(value, *args):
         if value is None:
             return None
+
+        # Like models.DateField(default=date.today)
+        if hasattr(value, '__call__'):
+            value = value()
+
         return formats.date_format(value, "DATE_FORMAT")
 
     @staticmethod
