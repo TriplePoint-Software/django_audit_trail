@@ -3,13 +3,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
 from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
 
 from .models import AuditTrail
 from .watcher import AuditTrailWatcher
 
 
 class ContentTypeFilter(SimpleListFilter):
-    title = 'content type'
+    title = _('content type')
     parameter_name = 'content_type'
 
     def lookups(self, request, model_admin):
@@ -43,7 +44,7 @@ def action(audit_trail):
             u'Related ' + audit_trail.related_trail.get_action_display().lower()
         )
 
-
+action.short_description = _('Action')
 action.allow_tags = True
 
 
@@ -51,6 +52,7 @@ def render_changes(audit_trail):
     changes = audit_trail.get_changes()
     return render_to_string('audit_trail/changes.html', {'audit_trail': audit_trail, 'changes': changes})
 
+render_changes.short_description = _('Changes')
 render_changes.allow_tags = True
 
 

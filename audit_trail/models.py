@@ -6,6 +6,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.module_loading import import_string
+from django.utils.translation import ugettext_lazy as _
 
 from jsonfield import JSONField
 
@@ -127,23 +128,26 @@ class AuditTrail(models.Model):
         RELATED_CHANGED = 4
 
     ACTION_CHOICES = (
-        (ACTIONS.CREATED, 'Created'),
-        (ACTIONS.UPDATED, 'Updated'),
-        (ACTIONS.DELETED, 'Deleted'),
-        (ACTIONS.RELATED_CHANGED, 'Related changed')
+        (ACTIONS.CREATED, _('Created')),
+        (ACTIONS.UPDATED, _('Updated')),
+        (ACTIONS.DELETED, _('Deleted')),
+        (ACTIONS.RELATED_CHANGED, _('Related changed'))
     )
 
     """ Table to store all changes of subscribed models. """
-    content_type = models.ForeignKey(ContentType, blank=True, null=True)
+    content_type = models.ForeignKey(ContentType, blank=True, null=True,
+                                     verbose_name=_('content type'))
     object_id = models.TextField(blank=True, null=True)
     content_object = GenericForeignKey('content_type', 'object_id')
 
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
-    user_ip = models.GenericIPAddressField(null=True)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True,
+                             verbose_name=_('user'))
+    user_ip = models.GenericIPAddressField(_('IP address'), null=True)
 
-    object_repr = models.CharField(max_length=200)
-    action = models.PositiveSmallIntegerField(choices=ACTION_CHOICES)
-    action_time = models.DateTimeField(auto_now=True)
+    object_repr = models.CharField(_('object repr'), max_length=200)
+    action = models.PositiveSmallIntegerField(_('action'),
+                                              choices=ACTION_CHOICES)
+    action_time = models.DateTimeField(_('date and time'), auto_now=True)
 
     # pylint: disable=E1123
     changes = JSONField(dump_kwargs=DUMP_KWARGS)
@@ -155,6 +159,8 @@ class AuditTrail(models.Model):
     class Meta:
         ordering = ('-id',)
         app_label = 'audit_trail'
+        verbose_name = _('audit trail')
+        verbose_name_plural = _('audit trails')
 
     def __unicode__(self):
         return u'%s was %s at %s' % (self.object_repr, self.get_action_display().lower(), self.action_time.isoformat())
