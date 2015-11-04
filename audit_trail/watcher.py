@@ -163,7 +163,7 @@ class AuditTrailWatcher(object):
         if self.track_only_with_related and not self.is_parent_object_exists(instance):
             return
 
-        changes = self.get_changes(instance._original_values, self.serialize_object(instance))
+        changes = self.get_changes(getattr(instance, '_original_values', {}), self.serialize_object(instance))
         if not changes:
             return
 
@@ -217,7 +217,6 @@ class AuditTrailWatcher(object):
 
                 if field_name in getattr(instance, '_audit_ids_to_notify_related_deletion', {}):
                     return True
-
         return False
 
     def create_related_audit_trail(self, audit_trail):

@@ -33,7 +33,9 @@ class ModelFieldStringifier(object):
 
         if getattr(field, 'choices', None):
             try:
-                return unicode(dict(field.choices)[value])
+                choices_dict = dict(field.choices)
+                value = choices_dict[value]
+                return unicode(value)
             except KeyError:
                 return unicode(value)
             except Exception, e:
