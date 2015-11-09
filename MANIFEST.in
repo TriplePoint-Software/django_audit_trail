@@ -1,1 +1,2 @@
 recursive-include audit_trail/templates *.html
+recursive-include audit_trail/locale *.po *.mo
