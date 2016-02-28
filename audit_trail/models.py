@@ -94,7 +94,7 @@ class AuditTrailManager(models.Manager):
     def generate_for_instance(self, instance, action):
         audit_trail = self.model(
             content_type=ContentType.objects.get_for_model(instance),
-            object_id=instance.id,
+            object_id=instance.pk,
             object_repr=unicode(instance)[:200],
             action=action
         )

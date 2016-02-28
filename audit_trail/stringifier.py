@@ -73,7 +73,7 @@ class ModelFieldStringifier(object):
         # if it's not model instance we assume it's an id
         if not isinstance(value, field.related_model):
             try:
-                value = field.related_model.objects.get(id=value)
+                value = field.related_model.objects.get(pk=value)
             except ObjectDoesNotExist:
                 return None
 
