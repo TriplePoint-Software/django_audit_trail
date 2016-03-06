@@ -64,7 +64,6 @@ class AuditTrailAdmin(admin.ModelAdmin):
 
     def __init__(self, *args, **kwargs):
         super(AuditTrailAdmin, self).__init__(*args, **kwargs)
-        self.list_display_links = (None,)
 
     def has_add_permission(self, request):
         return False
