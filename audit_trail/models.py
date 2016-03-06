@@ -163,7 +163,14 @@ class AuditTrail(models.Model):
         verbose_name_plural = _('audit trails')
 
     def __unicode__(self):
-        return u'%s was %s at %s' % (self.object_repr, self.get_action_display().lower(), self.action_time.isoformat())
+        if self.action != self.ACTIONS.RELATED_CHANGED:
+            return u'%s was %s at %s' % (
+                self.object_repr, self.get_action_display().lower(), self.action_time.isoformat()
+            )
+        else:
+            return u'%s %s at %s' % (
+                self.object_repr, self.get_action_display().lower(), self.action_time.isoformat()
+            )
 
     @property
     def is_created(self):

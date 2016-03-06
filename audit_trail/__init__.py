@@ -1,23 +1,27 @@
 # pylint: disable=E1101
+from django.apps import apps
+
 from .stringifier import ModelFieldStringifier
+from .watcher import AuditTrailWatcher
 
 
 def audit_trail_watch(cls, **kwargs):
-    from .watcher import AuditTrailWatcher
     related_watcher = AuditTrailWatcher(**kwargs)
     if related_watcher.contribute_to_class(cls):
         related_watcher.init_signals()
 
 
+# noinspection PyPep8Naming
 def get_for_object(obj):
-    from django.contrib.contenttypes.models import ContentType
-    from .models import AuditTrail
+    ContentType = apps.get_model('contenttypes', 'ContentType')
+    AuditTrail = apps.get_model('audit_trail', 'AuditTrail')
     content_type = ContentType.objects.get_for_model(obj)
     return AuditTrail.objects.filter(content_type=content_type, object_id=obj.id)
 
 
 def audit_trail_register_field_stringifier(field_class, callback):
     ModelFieldStringifier.add_stringifier(field_class, callback)
+
 
 # C0103 / Invalid constant name "default_app_config"
 # pylint: disable=C0103

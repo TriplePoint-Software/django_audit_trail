@@ -165,6 +165,7 @@ class TestAuditTrail(TestCase):
         author = User.objects.create()
         self.assertEqual(AuditTrail.objects.all().count(), 0)
         post = Post.objects.create(author=author)
+
         self.assertEqual(AuditTrail.objects.all().count(), 1)
         author.name = 'new name'
         author.save()

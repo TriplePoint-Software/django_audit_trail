@@ -2,6 +2,11 @@
 import os
 import sys
 
+import sys
+
+sys.path.append(os.path.realpath(os.path.join(os.path.dirname(__file__), '..')))
+
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 
