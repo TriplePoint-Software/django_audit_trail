@@ -1,5 +1,6 @@
 from django.db import models
-from audit_trail import AuditTrailWatcher, audit_trail_watch
+from audit_trail import audit_trail_watch
+from audit_trail.watcher import AuditTrailWatcher
 
 
 class TestModelTrackOneField(models.Model):
