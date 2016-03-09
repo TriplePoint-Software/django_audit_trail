@@ -38,7 +38,7 @@ class ModelFieldStringifier(object):
                 return unicode(value)
             except KeyError:
                 return unicode(value)
-            except Exception, e:
+            except Exception:
                 raise
 
         return unicode(value)

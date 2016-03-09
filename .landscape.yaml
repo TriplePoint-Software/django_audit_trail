@@ -7,3 +7,5 @@ ignore-paths:
 uses:
     - django
 autodetect: yes
+pep257:
+    run: false

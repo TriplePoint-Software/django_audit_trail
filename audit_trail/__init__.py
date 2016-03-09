@@ -1,4 +1,9 @@
-# pylint: disable=E1101
+"""
+Django Audit Trail
+
+by triplepoint software
+"""
+
 from django.apps import apps
 
 from .stringifier import ModelFieldStringifier
@@ -12,6 +17,7 @@ def audit_trail_watch(cls, **kwargs):
 
 
 # noinspection PyPep8Naming
+# pylint: disable=C0103
 def get_for_object(obj):
     ContentType = apps.get_model('contenttypes', 'ContentType')
     AuditTrail = apps.get_model('audit_trail', 'AuditTrail')

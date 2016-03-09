@@ -42,8 +42,8 @@ def runtests():
         test_args = ['_test_project.test_app']
     except ImportError:
         # Disabled
-        # - pylint: E0611 / No name 'simple' in module 'django.test'
-        # - pylint: F0401 / Unable to import 'django.test.simple'
+        # - pylint : E0611 / No name 'simple' in module 'django.test'
+        # - pylint : F0401 / Unable to import 'django.test.simple'
         # pylint: disable= F0401, E0611
         from django.test.simple import DjangoTestSuiteRunner
 

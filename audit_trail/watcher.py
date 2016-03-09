@@ -1,11 +1,10 @@
 # coding=utf-8
-from django.apps import apps
 from django.conf import settings
 from django.db.models import signals, NOT_PROVIDED
 from django.dispatch import receiver
 
 from .signals import audit_trail_app_ready
-from stringifier import ModelFieldStringifier
+from .stringifier import ModelFieldStringifier
 
 
 class AuditTrailWatcher(object):
@@ -162,8 +161,7 @@ class AuditTrailWatcher(object):
 
         if self.track_only_with_related and not self.is_parent_object_exists(instance):
             return
-
-        AuditTrail = apps.get_model('audit_trail', 'AuditTrail')
+        from .models import AuditTrail
         audit_trail = AuditTrail.objects.generate_trail_for_instance_created(instance)
         audit_trail.changes = self.get_changes({}, self.serialize_object(instance))
         audit_trail.save()
@@ -186,7 +184,7 @@ class AuditTrailWatcher(object):
         if not changes:
             return
 
-        AuditTrail = apps.get_model('audit_trail', 'AuditTrail')
+        from .models import AuditTrail
         audit_trail = AuditTrail.objects.generate_trail_for_instance_updated(instance)
         audit_trail.changes = changes
         audit_trail.save()
@@ -218,7 +216,7 @@ class AuditTrailWatcher(object):
         if self.track_only_with_related and not self.is_parent_object_exists(instance):
             return
 
-        AuditTrail = apps.get_model('audit_trail', 'AuditTrail')
+        from .models import AuditTrail
         audit_trail = AuditTrail.objects.generate_trail_for_instance_deleted(instance)
         audit_trail.changes = self.get_changes(self.serialize_object(instance), {})
         audit_trail.save()
@@ -259,7 +257,7 @@ class AuditTrailWatcher(object):
                 # RelatedManager doesn't have _meta attribute
                 notified_objects = attribute.all()
 
-            AuditTrail = apps.get_model('audit_trail', 'AuditTrail')
+            from .models import AuditTrail
             for notified_object in notified_objects:
                 parent_audit_trail = AuditTrail.objects.generate_trail_for_related_change(notified_object)
                 parent_audit_trail.related_trail = audit_trail
@@ -268,6 +266,8 @@ class AuditTrailWatcher(object):
     def create_deleted_related_audit_trail(self, audit_trail, instance):
         if not self.notify_related:
             return
+
+        from .models import AuditTrail
 
         for field_name in self.notify_related:
             attribute = getattr(instance, field_name)
@@ -297,7 +297,6 @@ class AuditTrailWatcher(object):
                 notified_objects = list(attribute.all())
 
             for notified_object in notified_objects:
-                AuditTrail = apps.get_model('audit_trail', 'AuditTrail')
                 parent_audit_trail = AuditTrail.objects.generate_trail_for_related_change(notified_object)
                 parent_audit_trail.related_trail = audit_trail
                 parent_audit_trail.save()
