@@ -1,4 +1,10 @@
 language: python
 python:
   - "2.7"
-script: python setup.py test
+install:
+  - pip install tox
+env:
+  - TOXENV=django18
+  - TOXENV=django19
+script:
+  - tox

@@ -21,10 +21,8 @@ SECRET_KEY = 'test_key'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-TEMPLATE_DEBUG = True
-
-ALLOWED_HOSTS = []
+# TEMPLATE_DEBUG = True
+# ALLOWED_HOSTS = []
 
 
 # Application definition
@@ -37,35 +35,35 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'audit_trail',
-    'test_app',
+    'test',
+    'test_project',
 )
-
-MIDDLEWARE_CLASSES = (
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-)
-
-ROOT_URLCONF = 'project.urls'
-
-WSGI_APPLICATION = 'project.wsgi.application'
+#
+# MIDDLEWARE_CLASSES = (
+#     'django.contrib.sessions.middleware.SessionMiddleware',
+#     'django.middleware.common.CommonMiddleware',
+#     'django.middleware.csrf.CsrfViewMiddleware',
+#     'django.contrib.auth.middleware.AuthenticationMiddleware',
+#     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+#     'django.contrib.messages.middleware.MessageMiddleware',
+#     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+# )
+#
+# ROOT_URLCONF = 'project.urls'
+#
+# WSGI_APPLICATION = 'project.wsgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+        'NAME': ':memory:',
+    },
 }
 
-MIGRATION_MODULES = {'test_app': "test_app.skip_migrations"}
+# MIGRATION_MODULES = {'test': "test.skip_migrations"}
 
-USE_TZ = False
-STATIC_URL = '/static/'
+# USE_TZ = False
+# STATIC_URL = '/static/'
