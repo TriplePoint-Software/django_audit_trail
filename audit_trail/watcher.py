@@ -1,7 +1,12 @@
 # coding=utf-8
 from django.conf import settings
 from django.db.models import signals, NOT_PROVIDED
-from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor, ReverseOneToOneDescriptor
+
+try:
+    from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor, ReverseOneToOneDescriptor
+except ImportError:
+    pass
+
 from django.dispatch import receiver
 
 from .signals import audit_trail_app_ready
