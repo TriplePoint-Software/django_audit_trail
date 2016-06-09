@@ -57,12 +57,18 @@ render_changes.allow_tags = True
 
 class AuditTrailAdmin(admin.ModelAdmin):
     list_display = ('id', 'action_time', 'content_type', action, 'user', 'user_ip', 'object_repr', render_changes)
+    list_display_links = None
     list_filter = (ContentTypeFilter, 'action',)
     search_fields = ('object_id', )
     actions = None
 
     def __init__(self, *args, **kwargs):
         super(AuditTrailAdmin, self).__init__(*args, **kwargs)
+
+    def has_change_permission(self, request, obj=None):
+        if obj is not None:
+            return False
+        return True
 
     def has_add_permission(self, request):
         return False
