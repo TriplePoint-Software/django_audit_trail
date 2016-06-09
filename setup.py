@@ -3,7 +3,7 @@ from setuptools.command.test import test as TestCommand
 import sys
 from setuptools import setup
 
-__version__ = "0.1.14"
+__version__ = "0.1.15"
 
 
 class Tox(TestCommand):
