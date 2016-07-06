@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
@@ -32,7 +33,7 @@ def action(audit_trail):
         AuditTrail.ACTIONS.CREATED: '#27DE55',
         AuditTrail.ACTIONS.UPDATED: '#FFFF84',
     }
-    row_template = u'<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">%s</div>'
+    row_template = '<div style="background-color: %s; padding: 5px; border-radius: 3px; font-weight: bold">%s</div>'
 
     if audit_trail.action in [AuditTrail.ACTIONS.CREATED, AuditTrail.ACTIONS.UPDATED, AuditTrail.ACTIONS.DELETED]:
 
@@ -40,7 +41,7 @@ def action(audit_trail):
     if audit_trail.is_related_changed:
         return row_template % (
             colors[audit_trail.related_trail.action],
-            u'Related ' + audit_trail.related_trail.get_action_display().lower()
+            'Related ' + audit_trail.related_trail.get_action_display().lower()
         )
 
 action.short_description = _('Action')

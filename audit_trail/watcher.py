@@ -8,6 +8,7 @@ except ImportError:
     pass
 
 from django.dispatch import receiver
+from django.utils.encoding import force_text
 
 from .signals import audit_trail_app_ready
 from .stringifier import ModelFieldStringifier
@@ -143,10 +144,10 @@ class AuditTrailWatcher(object):
             new_value_string = ModelFieldStringifier.stringify(field, new_value)
 
             if old_value is not None:
-                old_value = unicode(old_value)
+                old_value = force_text(old_value)
 
             if new_value is not None:
-                new_value = unicode(new_value)
+                new_value = force_text(new_value)
 
             if old_value != new_value:
                 diff[field_name] = {
