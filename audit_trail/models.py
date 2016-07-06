@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from collections import OrderedDict
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -6,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.utils.module_loading import import_string
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import force_text, python_2_unicode_compatible
 
 from jsonfield import JSONField
 
@@ -94,7 +96,7 @@ class AuditTrailManager(models.Manager):
         audit_trail = self.model(
             content_type=ContentType.objects.get_for_model(instance),
             object_id=instance.pk,
-            object_repr=unicode(instance)[:200],
+            object_repr=force_text(instance)[:200],
             action=action
         )
 
@@ -119,6 +121,7 @@ class AuditTrailManager(models.Manager):
         return self.generate_for_instance(instance, AuditTrail.ACTIONS.RELATED_CHANGED)
 
 
+@python_2_unicode_compatible
 class AuditTrail(models.Model):
     class ACTIONS(object):
         CREATED = 1
@@ -160,13 +163,13 @@ class AuditTrail(models.Model):
         verbose_name = _('audit trail')
         verbose_name_plural = _('audit trails')
 
-    def __unicode__(self):
+    def __str__(self):
         if self.action != self.ACTIONS.RELATED_CHANGED:
-            return u'%s was %s at %s' % (
+            return '%s was %s at %s' % (
                 self.object_repr, self.get_action_display().lower(), self.action_time.isoformat()
             )
         else:
-            return u'%s %s at %s' % (
+            return '%s %s at %s' % (
                 self.object_repr, self.get_action_display().lower(), self.action_time.isoformat()
             )
 
