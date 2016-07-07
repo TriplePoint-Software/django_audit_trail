@@ -1,6 +1,7 @@
 # coding=utf-8
 from django.conf import settings
 from django.db.models import signals, NOT_PROVIDED
+from django.db.models.expressions import CombinedExpression
 
 try:
     from django.db.models.fields.related_descriptors import ForwardManyToOneDescriptor, ReverseOneToOneDescriptor
@@ -120,7 +121,12 @@ class AuditTrailWatcher(object):
             not_tracked_field = (self.fields is not None and field.name not in self.fields)
             if not_tracked_field or field.name in self.excluded_fields:
                 continue
-            data[field.name] = field.value_from_object(instance)
+            value = field.value_from_object(instance)
+            # http://stackoverflow.com/questions/33672920/django-db-models-f-combined-expression
+            if isinstance(value, CombinedExpression):
+                instance.refresh_from_db()
+                return self.serialize_object(instance)
+            data[field.name] = value
         return data
 
     def get_changes(self, old_values, new_values):
