@@ -42,7 +42,7 @@ setup(
     maintainer='Max Syabro',
     maintainer_email='maxim@syabro.com',
     description='App for tracking django model changes',
-    install_requires=["django>=1.8,<1.10", "jsonfield==1.0.0"],
+    install_requires=["django>=1.4", "jsonfield==1.0.0"],
     tests_require=["tox"],
     cmdclass={'test': Tox},
     # test_suite='runtests.runtests'
