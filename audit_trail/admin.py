@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from django.contrib.contenttypes.models import ContentType
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.http import HttpResponseForbidden
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
@@ -58,18 +59,9 @@ render_changes.allow_tags = True
 
 class AuditTrailAdmin(admin.ModelAdmin):
     list_display = ('id', 'action_time', 'content_type', action, 'user', 'user_ip', 'object_repr', render_changes)
-    list_display_links = None
     list_filter = (ContentTypeFilter, 'action',)
     search_fields = ('object_id', )
     actions = None
-
-    def __init__(self, *args, **kwargs):
-        super(AuditTrailAdmin, self).__init__(*args, **kwargs)
-
-    def has_change_permission(self, request, obj=None):
-        if obj is not None:
-            return False
-        return True
 
     def has_add_permission(self, request):
         return False
@@ -82,6 +74,11 @@ class AuditTrailAdmin(admin.ModelAdmin):
 
     def format_json_values(self, obj):
         return obj.get_formatted_changes()
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        if request.method == 'POST':
+            return HttpResponseForbidden()
+        return super(AuditTrailAdmin, self).change_view(request, object_id, form_url, extra_context)
 
     format_json_values.short_description = 'Changes'
     format_json_values.allow_tags = True
