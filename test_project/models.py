@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from audit_trail import audit_trail_watch
 from audit_trail.watcher import AuditTrailWatcher
@@ -118,6 +119,7 @@ class AzazaField(models.CharField):
         kwargs['max_length'] = 255
         super(AzazaField, self).__init__(*args, **kwargs)
 
+
 class TestStringifierModel(models.Model):
     char = models.CharField(max_length=255, null=True)
     integer = models.IntegerField(null=True)
@@ -128,6 +130,9 @@ class TestStringifierModel(models.Model):
     float = models.FloatField(null=True)
     choice = models.PositiveIntegerField(null=True, choices=((0, 'Good choice'),))
     azaza = AzazaField(null=True)
+
+    ARRAY_CHOICES = ['alfa', 'beta', 'charlie']
+    array = ArrayField(models.CharField(max_length=16), default=[], blank=True, choices=ARRAY_CHOICES)
 
     audit = AuditTrailWatcher()
 

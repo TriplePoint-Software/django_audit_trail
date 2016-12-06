@@ -1,3 +1,4 @@
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import IntegerField
@@ -33,6 +34,9 @@ class ModelFieldStringifier(object):
         if isinstance(field, IntegerField):
             value = int(value)
 
+        if isinstance(field, ArrayField):
+            return force_text(', '.join(value))
+
         if getattr(field, 'choices', None):
             try:
                 choices_dict = dict(field.choices)
@@ -40,8 +44,6 @@ class ModelFieldStringifier(object):
                 return force_text(value)
             except KeyError:
                 return force_text(value)
-            except Exception:
-                raise
 
         return force_text(value)
 
