@@ -74,11 +74,21 @@ class ModelFieldStringifier(object):
         if value is None:
             return None
 
-        # if it's not model instance we assume it's an id
+        # iterate over to fields trying to look up the fk
         if not isinstance(value, field.related_model):
-            try:
-                value = field.related_model.objects.get(pk=value)
-            except ObjectDoesNotExist:
+            success = False
+            to_fields = field.to_fields or []
+            if 'pk' not in to_fields:
+                to_fields.append('pk')
+
+            for to_field in to_fields:
+                try:
+                    value = field.related_model.objects.get(**{to_field: value})
+                    success = True
+                    break
+                except ObjectDoesNotExist:
+                    pass
+            if not success:
                 return None
 
         return force_text(value)
