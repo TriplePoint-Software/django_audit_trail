@@ -3,7 +3,7 @@ from setuptools.command.test import test as TestCommand
 import sys
 from setuptools import setup
 
-__version__ = "0.1.21"
+__version__ = "0.1.22"
 
 
 class Tox(TestCommand):
@@ -42,7 +42,7 @@ setup(
     maintainer='Max Syabro',
     maintainer_email='maxim@syabro.com',
     description='App for tracking django model changes',
-    install_requires=["django>=1.8,<1.10", "jsonfield==1.0.0", "psycopg2>=2.6.2"],
+    install_requires=["django>=1.8,<1.12", "jsonfield==1.0.0", "psycopg2>=2.6.2"],
     tests_require=["tox"],
     cmdclass={'test': Tox},
     # test_suite='runtests.runtests'

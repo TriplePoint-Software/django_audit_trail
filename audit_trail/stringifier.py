@@ -82,6 +82,9 @@ class ModelFieldStringifier(object):
                 to_fields.append('pk')
 
             for to_field in to_fields:
+                if not to_field:
+                    continue
+
                 try:
                     value = field.related_model.objects.get(**{to_field: value})
                     success = True
