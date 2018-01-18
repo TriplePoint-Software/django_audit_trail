@@ -42,7 +42,7 @@ class ModelFieldStringifier(object):
                 choices_dict = dict(field.choices)
                 value = choices_dict[value]
                 return force_text(value)
-            except KeyError:
+            except (KeyError, TypeError):
                 return force_text(value)
 
         return force_text(value)
